@@ -14,7 +14,7 @@ import common.Constants;
 import common.Constants.DiskOperationType;
 import dblockcache.DBuffer;
 
-public abstract class VirtualDisk implements IVirtualDisk {
+public abstract class VirtualDisk implements IVirtualDisk, Runnable {
 
 	private String _volName;
 	private RandomAccessFile _file;

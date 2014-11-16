@@ -1,11 +1,41 @@
 package dblockcache;
 
+import java.io.IOException;
+
+import virtualdisk.VirtualDisk;
+import common.Constants;
+
 public class LocalDBuffer extends DBuffer {
 
+	private byte[] myBuffer;
+	private int myBlockID;
+	private int mySize;
+	
+	private VirtualDisk myDisk;
+	private boolean isBusy;
+	private boolean isValid;
+	private boolean isClean;
+	
+	public LocalDBuffer(int blockID, int size, VirtualDisk disk) {
+		myBuffer = new byte[size];
+		mySize = size;
+		myBlockID = blockID;
+		myDisk = disk;
+		isValid = false;
+		isBusy = false;
+		isClean = true;
+	}
 	@Override
 	public void startFetch() {
-		// TODO Auto-generated method stub
-		
+		isValid = false;
+		isBusy = true;
+		try {
+			myDisk.startRequest(this, Constants.DiskOperationType.READ);
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -22,14 +52,12 @@ public class LocalDBuffer extends DBuffer {
 
 	@Override
 	public boolean waitValid() {
-		// TODO Auto-generated method stub
-		return false;
+		return isValid;
 	}
 
 	@Override
 	public boolean checkClean() {
-		// TODO Auto-generated method stub
-		return false;
+		return isClean;
 	}
 
 	@Override
@@ -40,8 +68,7 @@ public class LocalDBuffer extends DBuffer {
 
 	@Override
 	public boolean isBusy() {
-		// TODO Auto-generated method stub
-		return false;
+		return isBusy;
 	}
 
 	@Override
@@ -64,14 +91,12 @@ public class LocalDBuffer extends DBuffer {
 
 	@Override
 	public int getBlockID() {
-		// TODO Auto-generated method stub
-		return 0;
+		return myBlockID;
 	}
 
 	@Override
 	public byte[] getBuffer() {
-		// TODO Auto-generated method stub
-		return null;
+		return myBuffer;
 	}
 
 }

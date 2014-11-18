@@ -123,4 +123,8 @@ public class LocalDBuffer extends DBuffer {
 	public byte[] getBuffer() {
 		return myBuffer;
 	}
+	
+	public void setBusy(boolean busy) {
+		isBusy = busy;
+	}
 }

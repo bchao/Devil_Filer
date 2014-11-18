@@ -2,6 +2,7 @@ package dfs;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -97,6 +98,8 @@ public class LocalDFS extends DFS {
 	@Override
 	public synchronized void destroyDFile(DFileID dFID) {
 		myInodes[dFID.getDFileID()].setInUse(false);
+		// TODO: have to destroy Inode data too
+		
 		myFreeDFID.add(dFID);
 		myUsedDFID.remove(dFID);
 	}
@@ -113,9 +116,32 @@ public class LocalDFS extends DFS {
 	 */
 	@Override
 	public int write(DFileID dFID, byte[] buffer, int startOffset, int count) {
+		ArrayList<Integer> blockIDs = new ArrayList<Integer>();
+		
+		for(int DFileBlock : getDFileBlocks(startOffset, count)) {
+			//check if inode corresponds
+			
+		}
 		
 
 		return 0;
+	}
+	
+	private ArrayList<Integer> getDFileBlocks(int startOffset, int count) {
+		ArrayList<Integer> ret = new ArrayList<Integer>();
+		int x = startOffset % Constants.BLOCK_SIZE;
+		ret.add(x);
+		
+		while(count > Constants.BLOCK_SIZE) {
+			ret.add(++x);
+			count -= Constants.BLOCK_SIZE;
+		}
+		
+		if(startOffset + count > Constants.BLOCK_SIZE) {
+			ret.add(++x);
+		}
+		
+		return ret;
 	}
 
 	@Override

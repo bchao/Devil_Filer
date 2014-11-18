@@ -53,6 +53,10 @@ public abstract class VirtualDisk implements IVirtualDisk, Runnable {
 		this(Constants.vdiskName, format);
 	}
 	
+	public RandomAccessFile returnRAF() {
+		return _file;
+	}
+	
 	public VirtualDisk() throws FileNotFoundException,
 	IOException {
 		this(Constants.vdiskName, false);

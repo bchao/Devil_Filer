@@ -21,7 +21,7 @@ public class Constants {
 	
 	public static final int MAX_DFILES = 512; // For recycling DFileIDs
 
-	public static final int MAX_INODE_BLOCKS = MAX_DFILES/INODE_SIZE;	
+	public static final int MAX_INODE_BLOCKS = MAX_DFILES / INODE_SIZE;
 	
 	/* DStore Operation types */
 	public enum DiskOperationType {

@@ -1,16 +1,19 @@
 package dblockcache;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
 
 import common.Constants;
-
 import virtualdisk.VirtualDisk;
 
 public class LocalDBufferCache extends DBufferCache {
 
 	private VirtualDisk myDisk;
-	private int myCacheSize; // do i need this?
+	private int myCacheSize;
+	private Queue<Integer> leastRecentlyUsed;
 	private Map<Integer, DBuffer> DBufferMap;
 	
 	public LocalDBufferCache(int cacheSize, VirtualDisk disk) {
@@ -18,6 +21,8 @@ public class LocalDBufferCache extends DBufferCache {
 		myCacheSize = cacheSize;
 		myDisk = disk;
 		DBufferMap = new HashMap<Integer, DBuffer>();
+		leastRecentlyUsed = new LinkedList<Integer>();
+		
 		Thread virtualDiskThread = new Thread(myDisk);
 		virtualDiskThread.start();
 	}
@@ -25,11 +30,37 @@ public class LocalDBufferCache extends DBufferCache {
 	@Override
 	public synchronized DBuffer getBlock(int blockID) {
 		if(DBufferMap.containsKey(blockID)) {
-			return DBufferMap.get(blockID);
+			LocalDBuffer dbuf = (LocalDBuffer) DBufferMap.get(blockID);
+			dbuf.setBusy(true);
+			if (leastRecentlyUsed.contains(blockID)) {
+				leastRecentlyUsed.remove(blockID);
+			}
+			leastRecentlyUsed.add(blockID);
+			return dbuf;
 		}
 		LocalDBuffer dbuf = new LocalDBuffer(blockID, Constants.BLOCK_SIZE, myDisk);
 		dbuf.setBusy(true);
+		
+		// eviction
+		if (DBufferMap.size() == myCacheSize){
+			Iterator<Integer> iterator = leastRecentlyUsed.iterator();
+	        while (iterator.hasNext()) {
+	            int current = iterator.next();
+	            if(!DBufferMap.get(current).isBusy()) {
+	                iterator.remove();
+	                DBufferMap.remove(current);
+	                break;
+	            }
+	        }
+        }
+
+        if (!dbuf.checkValid()) {
+            dbuf.startFetch();
+            dbuf.waitValid();
+        }
+		
 		DBufferMap.put(blockID, dbuf);
+		leastRecentlyUsed.add(blockID);
 		return dbuf;
 	}
 

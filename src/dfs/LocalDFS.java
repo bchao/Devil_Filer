@@ -2,13 +2,22 @@ package dfs;
 
 import java.util.List;
 
+import common.Constants;
 import common.DFileID;
+import virtualdisk.LocalVirtualDisk;
 
 public class LocalDFS extends DFS {
 
 	@Override
 	public void init() {
 		// TODO Auto-generated method stub
+		
+		for(int i = 1; i < Constants.MAX_INODE_BLOCKS + 1; i++) {
+			for(int j = 0; j < 32; j++) {
+				
+			}
+		}
+		
 		
 	}
 

@@ -18,9 +18,11 @@ public class Constants {
 	public static final int INODE_SIZE = 32; //32 Bytes
 	public static final int NUM_OF_CACHE_BLOCKS = 65536; // 2^16
 	public static final int MAX_FILE_SIZE = BLOCK_SIZE*500; // Constraint on the max file size
+	
+	public static final int MAX_DFILES = 512; // For recycling DFileIDs
 
-	public static final int MAX_DFILES = 512; // For recylcing DFileIDs
-
+	public static final int MAX_INODE_BLOCKS = MAX_DFILES/INODE_SIZE;	
+	
 	/* DStore Operation types */
 	public enum DiskOperationType {
 		READ, WRITE

@@ -96,7 +96,7 @@ public abstract class VirtualDisk implements IVirtualDisk, Runnable {
 	 * Reads the buffer associated with DBuffer to the underlying
 	 * device/disk/volume
 	 */
-	private int readBlock(DBuffer buf) throws IOException {
+	protected int readBlock(DBuffer buf) throws IOException {
 		int seekLen = buf.getBlockID() * Constants.BLOCK_SIZE;
 		/* Boundary check */
 		if (_maxVolSize < seekLen + Constants.BLOCK_SIZE) {
@@ -110,7 +110,7 @@ public abstract class VirtualDisk implements IVirtualDisk, Runnable {
 	 * Writes the buffer associated with DBuffer to the underlying
 	 * device/disk/volume
 	 */
-	private void writeBlock(DBuffer buf) throws IOException {
+	protected void writeBlock(DBuffer buf) throws IOException {
 		int seekLen = buf.getBlockID() * Constants.BLOCK_SIZE;
 		_file.seek(seekLen);
 		_file.write(buf.getBuffer(), 0, Constants.BLOCK_SIZE);

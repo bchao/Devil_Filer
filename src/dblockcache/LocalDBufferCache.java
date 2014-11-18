@@ -10,12 +10,12 @@ import virtualdisk.VirtualDisk;
 public class LocalDBufferCache extends DBufferCache {
 
 	private VirtualDisk myDisk;
-	private int myCacheSize;
+	private int myCacheSize; // do i need this?
 	private Map<Integer, DBuffer> DBufferMap;
 	
 	public LocalDBufferCache(int cacheSize, VirtualDisk disk) {
 		super(cacheSize);
-		myCacheSize = cacheSize; // Do I need to calculate this by multiplying by block size constant?
+		myCacheSize = cacheSize;
 		myDisk = disk;
 		DBufferMap = new HashMap<Integer, DBuffer>();
 		Thread virtualDiskThread = new Thread(myDisk);
@@ -40,7 +40,7 @@ public class LocalDBufferCache extends DBufferCache {
 	}
 
 	@Override
-	public void sync() {
+	public synchronized void sync() {
 		for (Integer id : DBufferMap.keySet()) {
 			LocalDBuffer dbuf = (LocalDBuffer) DBufferMap.get(id);
 			if (!dbuf.checkClean()) {

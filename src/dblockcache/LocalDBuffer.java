@@ -9,12 +9,12 @@ public class LocalDBuffer extends DBuffer {
 
 	private byte[] myBuffer;
 	private int myBlockID;
-	
+
 	private VirtualDisk myDisk;
 	private boolean isBusy;
 	private boolean isValid;
 	private boolean isClean;
-	
+
 	public LocalDBuffer(int blockID, int size, VirtualDisk disk) {
 		myBuffer = new byte[size];
 		myBlockID = blockID;
@@ -50,13 +50,18 @@ public class LocalDBuffer extends DBuffer {
 			e.printStackTrace();
 		}
 		synchronized (this){
-            isClean = true;
-           notifyAll();
-       }
+			isClean = true;
+			notifyAll();
+		}
 	}
 
 	@Override
-	public synchronized boolean checkValid() {
+	public boolean checkValid() {
+		return isValid;
+	}
+
+	@Override
+	public synchronized boolean waitValid() {
 		while (!isValid) {
 			try {
 				wait();
@@ -65,11 +70,6 @@ public class LocalDBuffer extends DBuffer {
 			}
 		}
 		return true;
-	}
-
-	@Override
-	public boolean waitValid() {
-		return isValid;
 	}
 
 	@Override

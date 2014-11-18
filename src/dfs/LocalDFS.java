@@ -118,7 +118,12 @@ public class LocalDFS extends DFS {
 
 	@Override
 	public int read(DFileID dFID, byte[] buffer, int startOffset, int count) {
-		// TODO Auto-generated method stub
+		Inode currInode = myInodes[dFID.getDFileID()];
+		
+		if(currInode == null)
+			return -1;
+		
+		
 		return 0;
 	}
 	
@@ -128,28 +133,30 @@ public class LocalDFS extends DFS {
 	 */
 	@Override
 	public int write(DFileID dFID, byte[] buffer, int startOffset, int count) {
-		ArrayList<Integer> blockIDs = new ArrayList<Integer>();
-		
 		Inode currInode = myInodes[dFID.getDFileID()];
 		
 		for(int DFileBlock : getDFileBlocks(startOffset, count)) {
 			memBlock mb = currInode.getBlockList()[DFileBlock];
-			
+			int blockID;
 			//TODO
 			//check if inode corresponds
 			if(mb == null) {
-				while(mb == null) {
+				if(myFreeBlocks.size() == 0) {
 					try {
-						wait();
-					} catch (InterruptedException e) {
+						throw new Exception("ERROR: NO FREE BLOCKS");
+					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
+				
+				blockID = myFreeBlocks.get(0);
+				myFreeBlocks.remove(0);
+			} else {
+				blockID = mb.getBlockID();
 			}
 			
 			//write to dbuffer
-			int blockID = mb.getBlockID();
 			DBuffer dBuffer = myDBufferCache.getBlock(blockID);
 			dBuffer.write(buffer, startOffset, count);
 		}
@@ -189,6 +196,13 @@ public class LocalDFS extends DFS {
 	public void sync() {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	public static void main(String[] args) {
+		LinkedList<Integer> list = new LinkedList<Integer>();
+		for(int i = 0; i < 10; i++) {
+			list.add(i);
+		}
 	}
 
 }

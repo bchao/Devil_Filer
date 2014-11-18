@@ -1,5 +1,6 @@
 package dfs;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
@@ -7,8 +8,9 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import common.Constants;
-import common.DFileID;
+import common.*;
+import dblockcache.*;
+import virtualdisk.Inode.memBlock;
 import virtualdisk.LocalVirtualDisk;
 import virtualdisk.Inode;
 
@@ -18,6 +20,8 @@ public class LocalDFS extends DFS {
 	LinkedList<DFileID> myUsedDFID;
 	LinkedList<Integer> myFreeBlocks;
 	Inode[] myInodes;
+	
+	LocalDBufferCache myDBufferCache;
 	
 	public LocalDFS(String volName, boolean format) {
 		super(volName, format);
@@ -47,7 +51,15 @@ public class LocalDFS extends DFS {
 	}	
 	@Override
 	public void init() {
-		// TODO Auto-generated method stub
+		if(myDBufferCache == null) {
+			try {
+				myDBufferCache = new LocalDBufferCache(Constants.NUM_OF_CACHE_BLOCKS, new LocalVirtualDisk(super._volName, super._format));
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 		
 		RandomAccessFile raFile = virtualDisk.returnRAF();
 		try {
@@ -118,13 +130,31 @@ public class LocalDFS extends DFS {
 	public int write(DFileID dFID, byte[] buffer, int startOffset, int count) {
 		ArrayList<Integer> blockIDs = new ArrayList<Integer>();
 		
-		for(int DFileBlock : getDFileBlocks(startOffset, count)) {
-			//check if inode corresponds
-			
-		}
+		Inode currInode = myInodes[dFID.getDFileID()];
 		
+		for(int DFileBlock : getDFileBlocks(startOffset, count)) {
+			memBlock mb = currInode.getBlockList()[DFileBlock];
+			
+			//TODO
+			//check if inode corresponds
+			if(mb == null) {
+				while(mb == null) {
+					try {
+						wait();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+			
+			//write to dbuffer
+			int blockID = mb.getBlockID();
+			DBuffer dBuffer = myDBufferCache.getBlock(blockID);
+			dBuffer.write(buffer, startOffset, count);
+		}
 
-		return 0;
+		return currInode.getFileSize();
 	}
 	
 	private ArrayList<Integer> getDFileBlocks(int startOffset, int count) {

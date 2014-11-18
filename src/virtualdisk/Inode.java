@@ -2,23 +2,33 @@ package virtualdisk;
 
 import java.util.*;
 
+import common.Constants;
+
 public class Inode {
 
 	private boolean inUse;
 	private int fileSize;
-	private ArrayList<Integer> myBlockList;
+//	private ArrayList<Integer> myBlockList;
+	private memBlock[] myBlockList;
 	
 	public Inode() {
 		inUse = false;
 		fileSize = 0;
-		myBlockList = new ArrayList<Integer>();
+//		myBlockList = new ArrayList<Integer>();
+		myBlockList = new memBlock[Constants.INODE_SIZE];
 	}
 	
-	public void addBlock(int block) {
-		myBlockList.add(block);
+	public void addBlock(int index, int block) {
+		myBlockList[index] = new memBlock(block);
+		fileSize++;
 	}
 	
-	public ArrayList<Integer> getBlockList() {
+	public void remBlock(int index) {
+		myBlockList[index] = null;
+		fileSize--;
+	}
+	
+	public memBlock[] getBlockList() {
 		return myBlockList;
 	}
 	
@@ -32,6 +42,22 @@ public class Inode {
 	
 	public void setInUse(boolean bool) {
 		inUse = bool;
+	}
+	
+	public class memBlock {
+		private int block;
+		
+		public memBlock(int b) {
+			block = b;
+		}
+		
+		public void setBlock(int b) {
+			block = b;
+		}
+		
+		public int getBlockID() {
+			return block;
+		}
 	}
 	
 }

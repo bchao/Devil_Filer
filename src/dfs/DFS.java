@@ -12,7 +12,7 @@ public abstract class DFS {
 
 	/* 
 	 * @volName: Explicitly overwrite volume name
-	 * @format: If format is true, the system should earse the underlying disk contents and reinialize the volume.
+	 * @format: If format is true, the system should erase the underlying disk contents and reinitialize the volume.
 	 */
 
 	DFS(String volName, boolean format) {

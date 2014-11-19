@@ -96,15 +96,56 @@ public class LocalDBuffer extends DBuffer {
 
 	@Override
 	public synchronized int read(byte[] buffer, int startOffset, int count) {
-		// TODO Auto-generated method stub
-		return 0;
+		isBusy = true;
+		
+		if (count > buffer.length) {
+			count = buffer.length;
+		}
+		
+		if (startOffset + count > buffer.length || startOffset + count < 0 || !isValid) {
+			return -1;
+		}
+		
+		for(int i = startOffset; i < count; i++) {
+			if(i == (count - 1)) {
+				notifyAll();
+				return count;
+			} else {
+				buffer[i] = myBuffer[i - startOffset];
+			}
+		}
+		
+		isBusy = false;
+		notifyAll();
+		return count;
 	}
 
 	@Override
 	public synchronized int write(byte[] buffer, int startOffset, int count) {
-		// TODO Auto-generated method stub
-
-		return 0;
+		isBusy = true;
+		
+		if(count > buffer.length) {
+			count = buffer.length;
+		}
+		
+		if(startOffset + count > buffer.length || startOffset + count < 0 || !isValid) {
+			return -1;
+		}
+		
+		isClean = false;
+		
+		for(int i = startOffset; i < count; i++) {
+			if(i < (count-1)) {
+				notifyAll();
+				return count;
+			} else {
+				myBuffer[i - startOffset] = buffer[i];
+			}
+		}
+		
+		isBusy = false;
+		notifyAll();
+		return count;
 	}
 
 	@Override

@@ -119,12 +119,23 @@ public class LocalDFS extends DFS {
 	@Override
 	public int read(DFileID dFID, byte[] buffer, int startOffset, int count) {
 		Inode currInode = myInodes[dFID.getDFileID()];
+		int currOffset = startOffset;
+		int currCount = count;
 		
 		if(currInode == null)
 			return -1;
 		
+		for(memBlock block : currInode.getBlockList()) {
+			if(block == null)
+				continue;
+			
+			LocalDBuffer dbuff = (LocalDBuffer) myDBufferCache.getBlock(block.getBlockID());
+			dbuff.read(buffer, currOffset, currCount);
+			currOffset += count;
+			currCount -= count;
+		}
 		
-		return 0;
+		return count;
 	}
 	
 	/*
@@ -157,7 +168,7 @@ public class LocalDFS extends DFS {
 			}
 			
 			//write to dbuffer
-			DBuffer dBuffer = myDBufferCache.getBlock(blockID);
+			LocalDBuffer dBuffer = (LocalDBuffer) myDBufferCache.getBlock(blockID);
 			dBuffer.write(buffer, startOffset, count);
 		}
 
@@ -197,12 +208,4 @@ public class LocalDFS extends DFS {
 		// TODO Auto-generated method stub
 		
 	}
-	
-	public static void main(String[] args) {
-		LinkedList<Integer> list = new LinkedList<Integer>();
-		for(int i = 0; i < 10; i++) {
-			list.add(i);
-		}
-	}
-
 }

@@ -111,7 +111,7 @@ public class LocalDBuffer extends DBuffer {
 				notifyAll();
 				return count;
 			} else {
-				buffer[i] = myBuffer[i - startOffset];
+				buffer[i - startOffset] = myBuffer[i];
 			}
 		}
 		

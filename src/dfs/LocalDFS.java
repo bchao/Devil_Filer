@@ -237,7 +237,6 @@ public class LocalDFS extends DFS {
 			dBuffer.write(buffer, startOffset, count);
 		}
 
-		// to do
 		return 0;
 	}
 	
@@ -271,7 +270,6 @@ public class LocalDFS extends DFS {
 
 	@Override
 	public void sync() {
-		// TODO Auto-generated method stub
-		
+		myDBufferCache.sync();
 	}
 }

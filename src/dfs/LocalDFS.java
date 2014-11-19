@@ -205,7 +205,6 @@ public class LocalDFS extends DFS {
 
 	@Override
 	public void sync() {
-		// TODO Auto-generated method stub
-		
+		myDBufferCache.sync();
 	}
 }

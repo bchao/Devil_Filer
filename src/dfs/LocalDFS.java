@@ -3,6 +3,7 @@ package dfs;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -40,6 +41,8 @@ public class LocalDFS extends DFS {
 		
 		// assuming 1 : 1 relation of inodes to dfiles
 		myInodes = new Inode[Constants.MAX_DFILES];
+		
+		init(); // initialize this bad boy
 	}
 
 	public LocalDFS(boolean format) {
@@ -51,6 +54,7 @@ public class LocalDFS extends DFS {
 	}	
 	@Override
 	public void init() {
+		
 		if(myDBufferCache == null) {
 			try {
 				myDBufferCache = new LocalDBufferCache(Constants.NUM_OF_CACHE_BLOCKS, new LocalVirtualDisk(super._volName, super._format));
@@ -62,6 +66,7 @@ public class LocalDFS extends DFS {
 		}
 		
 		RandomAccessFile raFile = virtualDisk.returnRAF();
+		
 		try {
 			raFile.seek(1);
 		} catch (IOException e) {
@@ -69,15 +74,69 @@ public class LocalDFS extends DFS {
 			e.printStackTrace();
 		}
 		
-		HashMap<DFileID, Inode> map = new HashMap<DFileID, Inode>();
+		//HashMap<DFileID, Inode> map = new HashMap<DFileID, Inode>();
 
-		for(int i = 1; i < Constants.MAX_INODE_BLOCKS + 1; i++) {
-			for(int j = 0; j < 32; j++) {
-				
-			}
+		// read through the virtual disk to get the goods
+		try {
+			initializeInodeState(raFile, 1);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
+		initializeDFileLists();
+
 	}
 	
+	private void initializeDFileLists() {
+		for (int i = 0; i < myInodes.length; i++) {
+			if (myInodes[i].getInUse()) {
+				myUsedDFID.add(new DFileID(i));
+				for (int blockID : myInodes[i].getUsedBlocks()) {
+					myFreeBlocks.remove(blockID);
+				}
+			} else {
+				myFreeDFID.add(new DFileID(i));
+			}
+		}
+		
+	}
+
+	// NOT TESTED, WILL DO TOMORROW (Wednesday) -- why does inode have to have size?
+	/**
+	 * This method assumes we just have a tag (-1) if its a written file and a block map
+	 * @param raFile the file passed in
+	 * @param numMetaData number of other data other than bmap
+	 * @throws IOException 
+	 */
+	private void initializeInodeState(RandomAccessFile raFile, int numMetaData) throws IOException {
+		int raFilePointer = 1;
+		
+		for (int i = 0; i < Constants.MAX_DFILES; i += Constants.INODE_SIZE) {
+			int[] myBMap = new int[Constants.INODE_SIZE/4 - 1];				
+			for (int j = 0; j < Constants.INODE_SIZE/4; j++) {
+				if (j == 0 && raFile.readInt() != -1) {
+					// moves file pointer ahead to next inode region
+					raFilePointer += (Constants.INODE_SIZE + Constants.INODE_SIZE/4 - 1); 
+					raFile.seek(raFilePointer);
+					myInodes[i] = new Inode(); // create the inode that has use = false
+					break; // not a used inode
+				}
+				
+				myBMap[j-1] = raFile.readInt();
+				
+			}
+			
+			myInodes[i] = createINode(myBMap);
+
+		}
+	}
+
+	private Inode createINode(int[] myBMap) {
+		Inode toRet = new Inode();
+		toRet.setInUse(true);
+		toRet.setBlockMap(myBMap);
+		return toRet;
+	}
+
 	private LinkedList<DFileID> initUsedlist() {
 		LinkedList<DFileID> ret = new LinkedList<DFileID>();
 		
@@ -88,12 +147,10 @@ public class LocalDFS extends DFS {
 
 	@Override
 	public synchronized DFileID createDFile() {
-		// TODO Auto-generated method stub
 		if(myFreeDFID.isEmpty()) {
 			try {
 				throw new Exception("ERROR: NO SPACE");
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} 
 		}

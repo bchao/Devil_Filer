@@ -8,14 +8,12 @@ public class Inode {
 
 	private boolean inUse;
 	private int fileSize;
-//	private ArrayList<Integer> myBlockList;
 	private memBlock[] myBlockList;
 	
 	public Inode() {
 		inUse = false;
 		fileSize = 0;
-//		myBlockList = new ArrayList<Integer>();
-		myBlockList = new memBlock[Constants.INODE_SIZE];
+		myBlockList = new memBlock[Constants.INODE_SIZE/4 - Constants.NUMBER_INODE_METADATA];
 	}
 	
 	public void addBlock(int index, int block) {
@@ -58,6 +56,22 @@ public class Inode {
 		public int getBlockID() {
 			return block;
 		}
+	}
+
+	public void setBlockMap(int[] myBMap) {
+		for (int i = 0; i < myBMap.length; i++) {
+			myBlockList[i] = new memBlock(myBMap[i]);
+		}
+	}
+
+	public List<Integer> getUsedBlocks() {
+		ArrayList<Integer> toRet = new ArrayList<Integer>();
+		for (int i = 0; i < myBlockList.length; i++) {
+			if (myBlockList[i] != null) {
+				toRet.add(myBlockList[i].block);
+			}
+		}
+		return toRet;
 	}
 	
 }

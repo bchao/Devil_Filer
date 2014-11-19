@@ -166,8 +166,16 @@ public class LocalDFS extends DFS {
 
 	@Override
 	public synchronized void destroyDFile(DFileID dFID) {
-		myInodes[dFID.getDFileID()].setInUse(false);
+		Inode currInode = myInodes[dFID.getDFileID()];
 		// TODO: have to destroy Inode data too
+		currInode.setInUse(false);
+		
+		for(memBlock block : currInode.getBlockList()) {
+			if(block != null) {
+				myFreeBlocks.add(block.getBlockID());
+				block = null;
+			}
+		}
 		
 		myFreeDFID.add(dFID);
 		myUsedDFID.remove(dFID);
@@ -219,7 +227,7 @@ public class LocalDFS extends DFS {
 				}
 				
 				blockID = myFreeBlocks.get(0);
-				myFreeBlocks.remove(0);
+				myFreeBlocks.remove((Integer) blockID);
 			} else {
 				blockID = mb.getBlockID();
 			}
@@ -229,7 +237,8 @@ public class LocalDFS extends DFS {
 			dBuffer.write(buffer, startOffset, count);
 		}
 
-		return currInode.getFileSize();
+		// to do
+		return 0;
 	}
 	
 	private ArrayList<Integer> getDFileBlocks(int startOffset, int count) {

@@ -106,7 +106,7 @@ public class LocalDBuffer extends DBuffer {
 			return -1;
 		}
 		
-		for(int i = startOffset; i < count; i++) {
+		for(int i = startOffset; i < startOffset + count; i++) {
 			if(i == (count - 1)) {
 				notifyAll();
 				return count;
@@ -134,7 +134,7 @@ public class LocalDBuffer extends DBuffer {
 		
 		isClean = false;
 		
-		for(int i = startOffset; i < count; i++) {
+		for(int i = startOffset; i < startOffset + count; i++) {
 			if(i < (count-1)) {
 				notifyAll();
 				return count;

@@ -52,7 +52,10 @@ public class Inode {
 
 	public void setBlockMap(int[] myBMap) {
 		for (int i = 0; i < myBMap.length; i++) {
-			myBlockList[i] = new memBlock(myBMap[i]);
+			if (myBMap[i] == 0) 
+				myBlockList[i] = null;
+			else 
+				myBlockList[i] = new memBlock(myBMap[i]);
 		}
 	}
 
@@ -64,6 +67,20 @@ public class Inode {
 			}
 		}
 		return toRet;
+	}
+	
+	public void printOut() {
+		System.out.println("*** Inode ***");
+		System.out.println("Is active: "+inUse);
+		for (int i = 0; i < myBlockList.length; i++) {
+			if (myBlockList[i] != null) 
+				System.out.println("BlockMap[" + i + "] = " + myBlockList[i].block);
+			else
+				System.out.println("BlockMap[" + i + "] = null");
+
+
+		}
+		System.out.println();
 	}
 	
 }

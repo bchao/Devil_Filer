@@ -14,35 +14,39 @@ import dblockcache.*;
 import virtualdisk.Inode.memBlock;
 import virtualdisk.LocalVirtualDisk;
 import virtualdisk.Inode;
+import virtualdisk.VirtualDisk;
 
 public class LocalDFS extends DFS {
-	LocalVirtualDisk virtualDisk;
-	LinkedList<DFileID> myFreeDFID;
-	LinkedList<DFileID> myUsedDFID;
-	LinkedList<Integer> myFreeBlocks;
-	Inode[] myInodes;
-	
+	public VirtualDisk virtualDisk;
+	public RandomAccessFile myRAFile;
+	public LinkedList<DFileID> myFreeDFID;
+	public LinkedList<DFileID> myUsedDFID;
+	public LinkedList<Integer> myFreeBlocks;
+	public Inode[] myInodes;
+
 	LocalDBufferCache myDBufferCache;
-	
+
 	public LocalDFS(String volName, boolean format) {
 		super(volName, format);
-		
+
 		myFreeDFID = new LinkedList<DFileID>();
+		myFreeBlocks = new LinkedList<Integer>();
+		myRAFile = null;
 		// temporary
 		for(int i = 0; i < Constants.MAX_DFILES; i++) {
 			myFreeDFID.add(new DFileID(i));			
 		}
-		
+
 		for(int i = 0; i < Constants.NUM_OF_BLOCKS; i++) {
-			myFreeBlocks.add(i);
+			myFreeBlocks.add((Integer) i);
 		}
-		
+
 		myUsedDFID = initUsedlist();
-		
+
 		// assuming 1 : 1 relation of inodes to dfiles
 		myInodes = new Inode[Constants.MAX_DFILES];
-		
-		init(); // initialize this bad boy
+
+		//		init(); // initialize this bad boy
 	}
 
 	public LocalDFS(boolean format) {
@@ -54,50 +58,54 @@ public class LocalDFS extends DFS {
 	}	
 	@Override
 	public void init() {
-		
-		if(myDBufferCache == null) {
-			try {
-				myDBufferCache = new LocalDBufferCache(Constants.NUM_OF_CACHE_BLOCKS, new LocalVirtualDisk(super._volName, super._format));
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		
-		RandomAccessFile raFile = virtualDisk.returnRAF();
-		
+
+		//		if(myDBufferCache == null) {
+		//			try {
+		//				myDBufferCache = new LocalDBufferCache(Constants.NUM_OF_CACHE_BLOCKS, new LocalVirtualDisk(super._volName, super._format));
+		//			} catch (FileNotFoundException e) {
+		//				e.printStackTrace();
+		//			} catch (IOException e) {
+		//				e.printStackTrace();
+		//			}
+		//		}
+
+		// will need to change back 
+		//RandomAccessFile raFile = virtualDisk.returnRAF();
+		RandomAccessFile raFile = myRAFile;
+
 		try {
 			raFile.seek(1);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		//HashMap<DFileID, Inode> map = new HashMap<DFileID, Inode>();
 
 		// read through the virtual disk to get the goods
+
 		try {
 			initializeInodeState(raFile, 1);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
 		initializeDFileLists();
 
 	}
-	
+
 	private void initializeDFileLists() {
 		for (int i = 0; i < myInodes.length; i++) {
 			if (myInodes[i].getInUse()) {
 				myUsedDFID.add(new DFileID(i));
 				for (int blockID : myInodes[i].getUsedBlocks()) {
-					myFreeBlocks.remove(blockID);
+					myFreeBlocks.remove((Integer) blockID);
 				}
 			} else {
 				myFreeDFID.add(new DFileID(i));
 			}
 		}
-		
+
 	}
 
 	// NOT TESTED, WILL DO TOMORROW (Wednesday) -- why does inode have to have size?
@@ -108,24 +116,33 @@ public class LocalDFS extends DFS {
 	 * @throws IOException 
 	 */
 	private void initializeInodeState(RandomAccessFile raFile, int numMetaData) throws IOException {
-		int raFilePointer = 1;
-		
-		for (int i = 0; i < Constants.MAX_DFILES; i += Constants.INODE_SIZE) {
-			int[] myBMap = new int[Constants.INODE_SIZE/4 - 1];				
+		int raFilePointer = Constants.BLOCK_SIZE;
+		raFile.seek(raFilePointer);
+
+		// skip first block
+		for (int i = 0; i < Constants.MAX_DFILES; i++) {
+			int[] myIntBMap = new int[Constants.INODE_SIZE/4 - 1];
+			boolean inUse = true;
 			for (int j = 0; j < Constants.INODE_SIZE/4; j++) {
+				int valid = 4;
 				if (j == 0 && raFile.readInt() != -1) {
 					// moves file pointer ahead to next inode region
-					raFilePointer += (Constants.INODE_SIZE + Constants.INODE_SIZE/4 - 1); 
+					raFilePointer += (Constants.INODE_SIZE - 4); 
 					raFile.seek(raFilePointer);
 					myInodes[i] = new Inode(); // create the inode that has use = false
+					inUse = false;
 					break; // not a used inode
+				} else if (j == 0) {
+					raFilePointer += 4;
+					continue;
+				} else {
+					myIntBMap[j-1] = raFile.readInt();
+					raFilePointer += 4;
 				}
-				
-				myBMap[j-1] = raFile.readInt();
-				
 			}
-			
-			myInodes[i] = createINode(myBMap);
+
+			if (inUse)
+				myInodes[i] = createINode(myIntBMap);
 
 		}
 	}
@@ -139,9 +156,9 @@ public class LocalDFS extends DFS {
 
 	private LinkedList<DFileID> initUsedlist() {
 		LinkedList<DFileID> ret = new LinkedList<DFileID>();
-		
+
 		// called in init
-		
+
 		return ret;
 	}
 
@@ -154,13 +171,13 @@ public class LocalDFS extends DFS {
 				e.printStackTrace();
 			} 
 		}
-		
+
 		DFileID dFID = myFreeDFID.get(0);
 		myFreeDFID.remove(dFID);
 		myUsedDFID.add(dFID);
-		
+
 		myInodes[dFID.getDFileID()].setInUse(true);
-		
+
 		return dFID;
 	}
 
@@ -169,14 +186,14 @@ public class LocalDFS extends DFS {
 		Inode currInode = myInodes[dFID.getDFileID()];
 		// TODO: have to destroy Inode data too
 		currInode.setInUse(false);
-		
+
 		for(memBlock block : currInode.getBlockList()) {
 			if(block != null) {
 				myFreeBlocks.add(block.getBlockID());
 				block = null;
 			}
 		}
-		
+
 		myFreeDFID.add(dFID);
 		myUsedDFID.remove(dFID);
 	}
@@ -186,23 +203,23 @@ public class LocalDFS extends DFS {
 		Inode currInode = myInodes[dFID.getDFileID()];
 		int currOffset = startOffset;
 		int currCount = count;
-		
+
 		if(currInode == null)
 			return -1;
-		
+
 		for(memBlock block : currInode.getBlockList()) {
 			if(block == null)
 				continue;
-			
+
 			LocalDBuffer dbuff = (LocalDBuffer) myDBufferCache.getBlock(block.getBlockID());
 			dbuff.read(buffer, currOffset, currCount);
 			currOffset += count;
 			currCount -= count;
 		}
-		
+
 		return count;
 	}
-	
+
 	/*
 	 * writes to the file specified by DFileID from the buffer starting from the
 	 * buffer offset startOffset; at most count bytes are transferred
@@ -210,7 +227,7 @@ public class LocalDFS extends DFS {
 	@Override
 	public int write(DFileID dFID, byte[] buffer, int startOffset, int count) {
 		Inode currInode = myInodes[dFID.getDFileID()];
-		
+
 		for(int DFileBlock : getDFileBlocks(startOffset, count)) {
 			memBlock mb = currInode.getBlockList()[DFileBlock];
 			int blockID;
@@ -225,13 +242,13 @@ public class LocalDFS extends DFS {
 						e.printStackTrace();
 					}
 				}
-				
+
 				blockID = myFreeBlocks.get(0);
 				myFreeBlocks.remove((Integer) blockID);
 			} else {
 				blockID = mb.getBlockID();
 			}
-			
+
 			//write to dbuffer
 			LocalDBuffer dBuffer = (LocalDBuffer) myDBufferCache.getBlock(blockID);
 			dBuffer.write(buffer, startOffset, count);
@@ -239,21 +256,21 @@ public class LocalDFS extends DFS {
 
 		return 0;
 	}
-	
+
 	private ArrayList<Integer> getDFileBlocks(int startOffset, int count) {
 		ArrayList<Integer> ret = new ArrayList<Integer>();
 		int x = startOffset % Constants.BLOCK_SIZE;
 		ret.add(x);
-		
+
 		while(count > Constants.BLOCK_SIZE) {
 			ret.add(++x);
 			count -= Constants.BLOCK_SIZE;
 		}
-		
+
 		if(startOffset + count > Constants.BLOCK_SIZE) {
 			ret.add(++x);
 		}
-		
+
 		return ret;
 	}
 
@@ -270,6 +287,20 @@ public class LocalDFS extends DFS {
 
 	@Override
 	public void sync() {
+		// TODO Auto-generated method stub
 		myDBufferCache.sync();
+
+	}
+
+	public Inode[] getINodes() {
+		return myInodes;
+	}
+
+	public void setVirtualDisk(VirtualDisk d) {
+		virtualDisk = d;
+	}
+
+	public void setRAFile(RandomAccessFile d) {
+		myRAFile = d;
 	}
 }

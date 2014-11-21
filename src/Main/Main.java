@@ -20,10 +20,15 @@ public class Main {
 		globalDFS = new LocalDFS(Constants.vdiskName, false);
 		globalDFS.init();
 		
+		printOutFSState();
+	}
+	
+	private static void printOutFSState() {
 		for(Inode n : ((LocalDFS) globalDFS).myInodes) {
 			n.printOut();
 		}
-		System.out.println("free blocsk: " + ((LocalDFS) globalDFS).myFreeBlocks.size());
+		
+		System.out.println("free blocks: " + ((LocalDFS) globalDFS).myFreeBlocks.size());
 		System.out.println("free ids: " + ((LocalDFS) globalDFS).myFreeDFID.size());
 		System.out.println("used ids: " + ((LocalDFS) globalDFS).myUsedDFID.size());
 	}

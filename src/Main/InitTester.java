@@ -31,7 +31,7 @@ public class InitTester {
 		
 		VirtualDisk myDisk = new LocalVirtualDisk(nameOfFile, false);
 		LocalDFS myDFS = new LocalDFS(nameOfFile, false);
-		myDFS.setVirtualDisk(myDisk);
+//		myDFS.setVirtualDisk(myDisk);
 //		myDFS.setRAFile(file);
 		myDFS.init();
 		

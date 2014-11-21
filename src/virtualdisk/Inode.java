@@ -7,11 +7,13 @@ import common.Constants;
 public class Inode {
 
 	private boolean inUse;
+	private int fileSize;
 	private memBlock[] myBlockList;
 	
 	public Inode() {
 		inUse = false;
 		myBlockList = new memBlock[Constants.INODE_SIZE/4 - Constants.NUMBER_INODE_METADATA];
+		fileSize = 0;
 	}
 	
 	public void addBlock(int index, int block) {
@@ -72,15 +74,18 @@ public class Inode {
 	public void printOut() {
 		System.out.println("*** Inode ***");
 		System.out.println("Is active: "+inUse);
+		System.out.println("File Size: " + fileSize);
 		for (int i = 0; i < myBlockList.length; i++) {
 			if (myBlockList[i] != null) 
 				System.out.println("BlockMap[" + i + "] = " + myBlockList[i].block);
 			else
 				System.out.println("BlockMap[" + i + "] = null");
-
-
 		}
 		System.out.println();
+	}
+
+	public void setSize(int size) {
+		fileSize = size;
 	}
 	
 }

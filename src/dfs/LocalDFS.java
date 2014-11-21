@@ -81,7 +81,7 @@ public class LocalDFS extends DFS {
 		// read through the virtual disk to get the goods
 
 		try {
-			initializeInodeState(raFile, 1);
+			initializeInodeState(raFile, Constants.NUMBER_INODE_METADATA);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -117,7 +117,8 @@ public class LocalDFS extends DFS {
 
 		// skip first block
 		for (int i = 0; i < Constants.MAX_DFILES; i++) {
-			int[] myIntBMap = new int[Constants.INODE_SIZE/4 - 1];
+			int[] myIntBMap = new int[Constants.INODE_SIZE/4 - Constants.NUMBER_INODE_METADATA];
+			int fileSize = 0;
 			boolean inUse = true;
 			for (int j = 0; j < Constants.INODE_SIZE/4; j++) {
 				if (j == 0) {
@@ -131,21 +132,23 @@ public class LocalDFS extends DFS {
 						raFilePointer += 4;
 						continue;
 					} 
+				} else if (j == 1) {
+					fileSize = raFile.readInt();
+					raFilePointer += 4;
 				} else {
 					myIntBMap[j-1] = raFile.readInt();
 					raFilePointer += 4;
 				}
-
-
 			}
 			if (inUse)
-				myInodes[i] = createINode(myIntBMap);
+				myInodes[i] = createINode(myIntBMap, fileSize);
 		}
 	}
 
-	private Inode createINode(int[] myBMap) {
+	private Inode createINode(int[] myBMap, int size) {
 		Inode toRet = new Inode();
 		toRet.setInUse(true);
+		toRet.setSize(size);
 		toRet.setBlockMap(myBMap);
 		return toRet;
 	}

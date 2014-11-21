@@ -15,6 +15,7 @@ import virtualdisk.Inode.memBlock;
 import virtualdisk.LocalVirtualDisk;
 import virtualdisk.Inode;
 import virtualdisk.VirtualDisk;
+import Main.Main;
 
 public class LocalDFS extends DFS {
 	public VirtualDisk virtualDisk;
@@ -24,11 +25,12 @@ public class LocalDFS extends DFS {
 	public LinkedList<Integer> myFreeBlocks;
 	public Inode[] myInodes;
 
-	LocalDBufferCache myDBufferCache;
+	LocalDBufferCache myDBufferCache = (LocalDBufferCache) Main.globalDBufferCache;
 
 	public LocalDFS(String volName, boolean format) {
 		super(volName, format);
-
+		
+		virtualDisk = Main.globalVirtualDisk;
 		myFreeDFID = new LinkedList<DFileID>();
 		myFreeBlocks = new LinkedList<Integer>();
 		myRAFile = null;
@@ -59,15 +61,15 @@ public class LocalDFS extends DFS {
 	@Override
 	public void init() {
 
-				if(myDBufferCache == null) {
-					try {
-						myDBufferCache = new LocalDBufferCache(Constants.NUM_OF_CACHE_BLOCKS, new LocalVirtualDisk(super._volName, super._format));
-					} catch (FileNotFoundException e) {
-						e.printStackTrace();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
+//				if(myDBufferCache == null) {
+//					try {
+//						myDBufferCache = new LocalDBufferCache(Constants.NUM_OF_CACHE_BLOCKS, new LocalVirtualDisk(super._volName, super._format));
+//					} catch (FileNotFoundException e) {
+//						e.printStackTrace();
+//					} catch (IOException e) {
+//						e.printStackTrace();
+//					}
+//				}
 
 		// will need to change back 
 

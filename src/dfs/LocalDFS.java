@@ -59,20 +59,20 @@ public class LocalDFS extends DFS {
 	@Override
 	public void init() {
 
-		//		if(myDBufferCache == null) {
-		//			try {
-		//				myDBufferCache = new LocalDBufferCache(Constants.NUM_OF_CACHE_BLOCKS, new LocalVirtualDisk(super._volName, super._format));
-		//			} catch (FileNotFoundException e) {
-		//				e.printStackTrace();
-		//			} catch (IOException e) {
-		//				e.printStackTrace();
-		//			}
-		//		}
+				if(myDBufferCache == null) {
+					try {
+						myDBufferCache = new LocalDBufferCache(Constants.NUM_OF_CACHE_BLOCKS, new LocalVirtualDisk(super._volName, super._format));
+					} catch (FileNotFoundException e) {
+						e.printStackTrace();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
 
 		// will need to change back 
-		//RandomAccessFile raFile = virtualDisk.returnRAF();
 
-		RandomAccessFile raFile = myRAFile;
+		RandomAccessFile raFile = virtualDisk.returnRAF();
+//		RandomAccessFile raFile = myRAFile;
 
 		try {
 			raFile.seek(1);

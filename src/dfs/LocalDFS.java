@@ -71,6 +71,7 @@ public class LocalDFS extends DFS {
 
 		// will need to change back 
 		//RandomAccessFile raFile = virtualDisk.returnRAF();
+
 		RandomAccessFile raFile = myRAFile;
 
 		try {
@@ -124,26 +125,26 @@ public class LocalDFS extends DFS {
 			int[] myIntBMap = new int[Constants.INODE_SIZE/4 - 1];
 			boolean inUse = true;
 			for (int j = 0; j < Constants.INODE_SIZE/4; j++) {
-				int valid = 4;
-				if (j == 0 && raFile.readInt() != -1) {
-					// moves file pointer ahead to next inode region
-					raFilePointer += (Constants.INODE_SIZE - 4); 
-					raFile.seek(raFilePointer);
-					myInodes[i] = new Inode(); // create the inode that has use = false
-					inUse = false;
-					break; // not a used inode
-				} else if (j == 0) {
-					raFilePointer += 4;
-					continue;
+				if (j == 0) {
+					if (raFile.readInt() != -1) {
+						raFilePointer += (Constants.INODE_SIZE); 
+						raFile.seek(raFilePointer);
+						myInodes[i] = new Inode(); // create the inode that has use = false
+						inUse = false;
+						break; // not a used inode
+					} else {
+						raFilePointer += 4;
+						continue;
+					} 
 				} else {
 					myIntBMap[j-1] = raFile.readInt();
 					raFilePointer += 4;
 				}
-			}
 
+
+			}
 			if (inUse)
 				myInodes[i] = createINode(myIntBMap);
-
 		}
 	}
 

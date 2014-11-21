@@ -40,13 +40,12 @@ public class InitTester {
 			n.printOut();
 		}
 		
+		System.out.println("free blocsk: " + myDFS.myFreeBlocks.size());
+		System.out.println("free ids: " + myDFS.myFreeDFID.size());
+		System.out.println("used ids: " + myDFS.myUsedDFID.size());
 		
 		file.close();
-//		Inode node = new Inode();
-//		node.setInUse(true);
-//		node.addBlock(0, 1);
-//		node.addBlock(1, 20);
-//		node.printOut();
+
 	}
 	
 
@@ -69,7 +68,7 @@ public class InitTester {
 		writeToBytes(b, 0, 10, false);
 		file.write(b, 0, b.length);
 		
-		seekLen = Constants.BLOCK_SIZE + 2*Constants.INODE_SIZE;;
+		seekLen = Constants.BLOCK_SIZE + 2*Constants.INODE_SIZE;
 		file.seek(seekLen);
 		writeToBytes(b, -1, -1, true);
 		file.write(b, 0, b.length);
@@ -124,12 +123,7 @@ public class InitTester {
 		b[1] = (byte) -1;
 		b[2] = (byte) -1;
 		b[3] = (byte) -1;
-//		
-//		byte[] temp = new byte[4];
-//		temp[2] = (byte) 1;
-//		temp[3] = (byte) 32;
-//		ByteBuffer bbuff = ByteBuffer.wrap(temp);
-//		System.out.println(bbuff.getInt());
+
 	}
 
 }

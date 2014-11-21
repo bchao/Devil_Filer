@@ -27,6 +27,7 @@ public class InitTester {
 		file.setLength(Constants.BLOCK_SIZE * Constants.NUM_OF_BLOCKS);
 		
 		writeToFile(file);
+		file.close();
 		
 		VirtualDisk myDisk = new LocalVirtualDisk(nameOfFile, false);
 		LocalDFS myDFS = new LocalDFS(nameOfFile, false);
@@ -44,7 +45,7 @@ public class InitTester {
 		System.out.println("free ids: " + myDFS.myFreeDFID.size());
 		System.out.println("used ids: " + myDFS.myUsedDFID.size());
 		
-		file.close();
+		//file.close();
 
 	}
 	

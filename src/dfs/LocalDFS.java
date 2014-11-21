@@ -74,13 +74,6 @@ public class LocalDFS extends DFS {
 		RandomAccessFile raFile = virtualDisk.returnRAF();
 //		RandomAccessFile raFile = myRAFile;
 
-		try {
-			raFile.seek(1);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
 		//HashMap<DFileID, Inode> map = new HashMap<DFileID, Inode>();
 
 		// read through the virtual disk to get the goods

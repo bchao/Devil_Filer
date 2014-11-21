@@ -2,6 +2,7 @@ package virtualdisk;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.Queue;
 
 import common.Constants;
@@ -14,6 +15,8 @@ public class LocalVirtualDisk extends VirtualDisk implements Runnable {
 
 	public LocalVirtualDisk(String volName, boolean format) throws FileNotFoundException, IOException {
 		super(volName, format);
+		
+		requestQueue = new LinkedList<Request>();
 	}
 	
 	public LocalVirtualDisk(boolean format) throws FileNotFoundException, IOException {

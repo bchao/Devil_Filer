@@ -28,10 +28,10 @@ public class InitTester {
 		
 		writeToFile(file);
 		
-	//	VirtualDisk myDisk = new LocalVirtualDisk(nameOfFile, false);
+		VirtualDisk myDisk = new LocalVirtualDisk(nameOfFile, false);
 		LocalDFS myDFS = new LocalDFS(nameOfFile, false);
-		//myDFS.setVirtualDisk(myDisk);
-		myDFS.setRAFile(file);
+		myDFS.setVirtualDisk(myDisk);
+//		myDFS.setRAFile(file);
 		myDFS.init();
 		
 		int count = 0;

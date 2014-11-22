@@ -219,7 +219,7 @@ public class LocalDFS extends DFS {
 	@Override
 	public int read(DFileID dFID, byte[] buffer, int startOffset, int count) {
 		Inode currInode = myInodes[dFID.getDFileID()];
-		int currOffset = startOffset;
+		int currOffset = startOffset + Constants.MAX_INODE_BLOCKS + 1;
 		int currCount = count;
 
 		if(currInode == null)

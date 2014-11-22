@@ -33,15 +33,14 @@ public class Main {
 	}
 	
 	private static void testReadWriteFile() {
-		
-		DFileID dfid0 = globalDFS.createDFile();
+		DFileID dfid = globalDFS.createDFile();
 
 		byte[] arr = new byte[4];
 		arr[0] = (byte) 10;
 		arr[1] = (byte) 20;
 		arr[2] = (byte) 30;
 		arr[3] = (byte) 40;
-		User user1 = new User(dfid0, arr, 0, 4, Constants.DiskOperationType.WRITE);
+		User user1 = new User(dfid, arr, 0, 4, Constants.DiskOperationType.WRITE);
 		user1.start();
 	}
 	

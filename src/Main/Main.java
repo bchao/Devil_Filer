@@ -47,6 +47,8 @@ public class Main {
 		User u1 = new User(null, null, 0, 0, Constants.DiskOperationType.CREATE);
 		u0.start();
 		u1.start();
+		User u2 = new User(((LocalDFS) globalDFS).getDFileID(0), null, 0, 0, Constants.DiskOperationType.DESTROY);
+		u2.start();
 	}
 
 	private static void printOutFSState() {

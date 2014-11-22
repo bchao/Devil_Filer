@@ -27,12 +27,13 @@ public class User extends Thread {
 		
 		case CREATE:
 			Main.globalDFS.createDFile();
-			Main.globalTestEventBarrier.raise();
+			//Main.globalTestEventBarrier.raise();
 			
 		break;
 		
 		case DESTROY:
 			Main.globalDFS.destroyDFile(myDFileID);
+			Main.globalTestEventBarrier.raise();
 		break;
 		
 		case READ:		

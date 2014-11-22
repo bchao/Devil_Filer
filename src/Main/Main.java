@@ -25,7 +25,8 @@ public class Main {
 		globalTestEventBarrier = new EventBarrier();
 		
 //		testCreateFile();
-		testReadWriteFile();
+		testDestroyFile();
+//		testReadWriteFile();
 		
 //		globalTestEventBarrier.arrive(); // wait until everything has tested
 		
@@ -45,6 +46,13 @@ public class Main {
 	}
 	
 	private static void testCreateFile() {
+		User u0 = new User(null, null, 0, 0, Constants.DiskOperationType.CREATE);
+		User u1 = new User(null, null, 0, 0, Constants.DiskOperationType.CREATE);
+		u0.start();
+		u1.start();
+	}
+	
+	private static void testDestroyFile() {
 		User u0 = new User(null, null, 0, 0, Constants.DiskOperationType.CREATE);
 		User u1 = new User(null, null, 0, 0, Constants.DiskOperationType.CREATE);
 		u0.start();

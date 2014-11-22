@@ -184,15 +184,17 @@ public class LocalDFS extends DFS {
 
 		myInodes[dFID.getDFileID()].setInUse(true);
 
+		notifyAll();
+		
 		return dFID;
 	}
 
 	@Override
 	public synchronized void destroyDFile(DFileID dFID) {
 		
-		if(!myUsedDFID.containsValue(dFID)) {
+		while(!myUsedDFID.containsValue(dFID)) {
 			try {
-				throw new Exception("ERROR: FILE DOES NOT EXIST1");
+				wait();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -211,7 +213,7 @@ public class LocalDFS extends DFS {
 
 		myFreeDFID.add(dFID);
 		
-		myUsedDFID.remove(dFID);
+		myUsedDFID.remove(dFID.getDFileID());
 //		myUsedDFIDList.remove(dFID);
 	}
 
@@ -293,13 +295,14 @@ public class LocalDFS extends DFS {
 	
 	public synchronized DFileID getDFileID(int x) {
 		
-		if(myUsedDFID.get(x) == null) {
+		while (myUsedDFID.get(x) == null) {
 			try {
-				throw new Exception("ERROR: FILE DOES NOT EXIST");
-			} catch (Exception e) {
+				wait();
+			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
+
 		return myUsedDFID.get(x);
 	}
 

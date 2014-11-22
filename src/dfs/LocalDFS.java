@@ -199,6 +199,8 @@ public class LocalDFS extends DFS {
 			}
 		}
 		
+		dFID.setInUse(true);
+		
 		Inode currInode = myInodes[dFID.getDFileID()];
 		// TODO: have to destroy Inode data too
 		currInode.setInUse(false);
@@ -211,13 +213,27 @@ public class LocalDFS extends DFS {
 		}
 
 		myFreeDFID.add(dFID);
-		
 		myUsedDFID.remove(dFID.getDFileID());
 //		myUsedDFIDList.remove(dFID);
+		
+		dFID.setInUse(false);
+		notifyAll();
+		
 	}
 
 	@Override
-	public int read(DFileID dFID, byte[] buffer, int startOffset, int count) {
+	public synchronized int read(DFileID dFID, byte[] buffer, int startOffset, int count) {
+		
+		while (dFID.isInUse()) {
+			try {
+				wait();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		dFID.setInUse(true);
+		
 		Inode currInode = myInodes[dFID.getDFileID()];
 		int currOffset = startOffset;
 		int currCount = count;
@@ -235,6 +251,9 @@ public class LocalDFS extends DFS {
 			currCount -= count;
 		}
 
+		dFID.setInUse(false);
+		notifyAll();
+		
 		return count;
 	}
 
@@ -243,7 +262,18 @@ public class LocalDFS extends DFS {
 	 * buffer offset startOffset; at most count bytes are transferred
 	 */
 	@Override
-	public int write(DFileID dFID, byte[] buffer, int startOffset, int count) {
+	public synchronized int write(DFileID dFID, byte[] buffer, int startOffset, int count) {
+		
+		while (dFID.isInUse()) {
+			try {
+				wait();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		dFID.setInUse(true);
+		
 		Inode currInode = myInodes[dFID.getDFileID()];
 
 		for(int DFileBlock : getDFileBlocks(startOffset, count)) {
@@ -272,6 +302,9 @@ public class LocalDFS extends DFS {
 			dBuffer.write(buffer, startOffset, count);
 		}
 
+		dFID.setInUse(false);
+		notifyAll();
+		
 		return 0;
 	}
 

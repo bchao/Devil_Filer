@@ -1,6 +1,5 @@
 package Main;
 
-import common.Constants;
 import common.Constants.DiskOperationType;
 import common.DFileID;
 
@@ -33,7 +32,6 @@ public class User extends Thread {
 		
 		case DESTROY:
 			Main.globalDFS.destroyDFile(myDFileID);
-			Main.globalTestEventBarrier.raise();
 		break;
 		
 		case READ:		
@@ -42,6 +40,7 @@ public class User extends Thread {
 		
 		case WRITE:
 			Main.globalDFS.write(myDFileID, myByteArray, myOffset, myCount);
+			Main.globalTestEventBarrier.raise();
 		break;
 		
 		}

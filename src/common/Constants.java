@@ -25,7 +25,7 @@ public class Constants {
 	public static final int NUMBER_INODE_METADATA = 2; // in use or file size
 	/* DStore Operation types */
 	public enum DiskOperationType {
-		READ, WRITE
+		READ, WRITE, CREATE, DESTROY
 	};
 
 	/* Virtual disk file/store name */

@@ -191,7 +191,7 @@ public class LocalDFS extends DFS {
 		
 		if(!myUsedDFID.containsValue(dFID)) {
 			try {
-				throw new Exception("ERROR: FILE DOES NOT EXIST");
+				throw new Exception("ERROR: FILE DOES NOT EXIST1");
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

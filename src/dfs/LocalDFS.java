@@ -27,12 +27,13 @@ public class LocalDFS extends DFS {
 	public LinkedList<Integer> myFreeBlocks;
 	public Inode[] myInodes;
 
-	LocalDBufferCache myDBufferCache = (LocalDBufferCache) Main.globalDBufferCache;
+	LocalDBufferCache myDBufferCache;
 
 	public LocalDFS(String volName, boolean format) {
 		super(volName, format);
 		
 		virtualDisk = Main.globalVirtualDisk;
+		myDBufferCache = (LocalDBufferCache) Main.globalDBufferCache;
 		myFreeDFID = new LinkedList<DFileID>();
 		myFreeBlocks = new LinkedList<Integer>();
 		myRAFile = null;

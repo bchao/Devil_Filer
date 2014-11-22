@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import EventBarrier.EventBarrier;
 import common.Constants;
+import common.DFileID;
 import dblockcache.*;
 import dfs.*;
 import virtualdisk.*;
@@ -18,16 +19,30 @@ public class Main {
 	public static void main(String[] args) throws FileNotFoundException, IOException {
 		//create disk
 		globalVirtualDisk = new LocalVirtualDisk(Constants.vdiskName, false);
-		
+		globalDBufferCache = new LocalDBufferCache(Constants.NUM_OF_CACHE_BLOCKS, globalVirtualDisk);
 		globalDFS = new LocalDFS(Constants.vdiskName, false);
 		globalDFS.init();
 		globalTestEventBarrier = new EventBarrier();
 		
-		testCreateFile();
+//		testCreateFile();
+		testReadWriteFile();
 		
-		globalTestEventBarrier.arrive(); // wait until everything has tested
+//		globalTestEventBarrier.arrive(); // wait until everything has tested
 		
 		printOutFSState();
+	}
+	
+	private static void testReadWriteFile() {
+		
+		DFileID dfid0 = globalDFS.createDFile();
+
+		byte[] arr = new byte[4];
+		arr[0] = (byte) 10;
+		arr[1] = (byte) 20;
+		arr[2] = (byte) 30;
+		arr[3] = (byte) 40;
+		User user1 = new User(dfid0, arr, 0, 4, Constants.DiskOperationType.WRITE);
+		user1.start();
 	}
 	
 	private static void testCreateFile() {

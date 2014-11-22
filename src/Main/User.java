@@ -33,6 +33,7 @@ public class User extends Thread {
 		
 		case DESTROY:
 			Main.globalDFS.destroyDFile(myDFileID);
+			Main.globalTestEventBarrier.raise();
 		break;
 		
 		case READ:		

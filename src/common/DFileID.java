@@ -4,9 +4,11 @@ package common;
 public class DFileID {
 
 	private int _dFID;
+	private boolean inUse;
 
 	public DFileID(int dFID) {
 		_dFID = dFID;
+		inUse = false;
 	}
 
 	public int getDFileID() {
@@ -23,5 +25,14 @@ public class DFileID {
 	    
 	public String toString(){
 		return _dFID+"";
+	}
+	
+	public synchronized boolean isInUse() {
+		return inUse;
+	}
+	
+	public synchronized void setInUse(boolean b) {
+		inUse = b;
+		
 	}
 }

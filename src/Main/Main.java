@@ -25,8 +25,8 @@ public class Main {
 		globalTestEventBarrier = new EventBarrier();
 		
 //		testCreateFile();
-		testDestroyFile();
-//		testReadWriteFile();
+//		testDestroyFile();
+		testReadWriteFile();
 		
 //		globalTestEventBarrier.arrive(); // wait until everything has tested
 		

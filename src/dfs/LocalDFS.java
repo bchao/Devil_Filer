@@ -18,10 +18,12 @@ import virtualdisk.VirtualDisk;
 import Main.Main;
 
 public class LocalDFS extends DFS {
+	
 	public VirtualDisk virtualDisk;
 	public RandomAccessFile myRAFile;
 	public LinkedList<DFileID> myFreeDFID;
-	public LinkedList<DFileID> myUsedDFID;
+	public HashMap<Integer, DFileID> myUsedDFID;
+//	public LinkedList<DFileID> myUsedDFIDList;
 	public LinkedList<Integer> myFreeBlocks;
 	public Inode[] myInodes;
 
@@ -43,7 +45,8 @@ public class LocalDFS extends DFS {
 			myFreeBlocks.add((Integer) i);
 		}
 
-		myUsedDFID = initUsedlist();
+//		myUsedDFIDList = new LinkedList<DFileID>();
+		myUsedDFID = new HashMap<Integer, DFileID>();
 
 		// assuming 1 : 1 relation of inodes to dfiles
 		myInodes = new Inode[Constants.MAX_DFILES];
@@ -93,7 +96,8 @@ public class LocalDFS extends DFS {
 	private void initializeDFileLists() {
 		for (int i = 0; i < myInodes.length; i++) {
 			if (myInodes[i].getInUse()) {
-				myUsedDFID.add(new DFileID(i));
+				//myUsedDFID.add(new DFileID(i));
+				myUsedDFID.put(0, new DFileID(i));
 				for (int blockID : myInodes[i].getUsedBlocks()) {
 					myFreeBlocks.remove((Integer) blockID);
 				}
@@ -173,7 +177,9 @@ public class LocalDFS extends DFS {
 
 		DFileID dFID = myFreeDFID.get(0);
 		myFreeDFID.remove(dFID);
-		myUsedDFID.add(dFID);
+		
+//		myUsedDFIDList.add(dFID);
+		myUsedDFID.put(dFID.getDFileID(), dFID);
 
 		myInodes[dFID.getDFileID()].setInUse(true);
 
@@ -182,6 +188,15 @@ public class LocalDFS extends DFS {
 
 	@Override
 	public synchronized void destroyDFile(DFileID dFID) {
+		
+		if(!myUsedDFID.containsValue(dFID)) {
+			try {
+				throw new Exception("ERROR: FILE DOES NOT EXIST");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
 		Inode currInode = myInodes[dFID.getDFileID()];
 		// TODO: have to destroy Inode data too
 		currInode.setInUse(false);
@@ -194,7 +209,9 @@ public class LocalDFS extends DFS {
 		}
 
 		myFreeDFID.add(dFID);
+		
 		myUsedDFID.remove(dFID);
+//		myUsedDFIDList.remove(dFID);
 	}
 
 	@Override
@@ -272,6 +289,18 @@ public class LocalDFS extends DFS {
 
 		return ret;
 	}
+	
+	public synchronized DFileID getDFileID(int x) {
+		
+		if(myUsedDFID.get(x) == null) {
+			try {
+				throw new Exception("ERROR: FILE DOES NOT EXIST");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return myUsedDFID.get(x);
+	}
 
 	@Override
 	public int sizeDFile(DFileID dFID) {
@@ -281,7 +310,7 @@ public class LocalDFS extends DFS {
 
 	@Override
 	public List<DFileID> listAllDFiles() {
-		return myUsedDFID;
+		return (List<DFileID>) myUsedDFID.values();
 	}
 
 	@Override

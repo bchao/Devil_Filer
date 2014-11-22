@@ -22,10 +22,13 @@ public class User extends Thread {
 	}
 	
 	public void run() {
+		
 		switch (myOp) {
 		
 		case CREATE:
 			Main.globalDFS.createDFile();
+			Main.globalTestEventBarrier.raise();
+			
 		break;
 		
 		case DESTROY:
@@ -39,7 +42,6 @@ public class User extends Thread {
 		case WRITE:
 			Main.globalDFS.write(myDFileID, myByteArray, myOffset, myCount);
 		break;
-
 		
 		}
 			

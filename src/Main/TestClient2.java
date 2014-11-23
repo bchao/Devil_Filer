@@ -11,6 +11,7 @@ import dblockcache.LocalDBufferCache;
 import dfs.LocalDFS;
 
 public class TestClient2 {
+	private static String readStr;
 	//public TestClient2() {}
 
 	//	private void WriteTest(DFileID f, String t) {
@@ -45,7 +46,22 @@ public class TestClient2 {
 		//DFileID file = new DFileID(4);
 
 		//TestClient2 tc = new TestClient2();
-		ArrayList<User> clients = test1();
+		//ArrayList<User> clients = test1();
+		
+		ArrayList<User> clients = new ArrayList<User>();
+		User u0 = new User(null, null, 0, 0, DiskOperationType.CREATE);
+		clients.add(u0);
+		u0.start();
+		String t = "Hello World";
+		byte[] data = t.getBytes();
+		byte[] read = new byte[data.length];
+		User u1 = new User(((LocalDFS) Main.globalDFS).getDFileID(0), data, 0, data.length, DiskOperationType.WRITE);
+		clients.add(u1);
+		u1.start();
+		//User u2 = new User(((LocalDFS) Main.globalDFS).getDFileID(0), data, 0, data.length, DiskOperationType.WRITE);
+		User u2 = new User(((LocalDFS) Main.globalDFS).getDFileID(0), read, 0, data.length, DiskOperationType.READ); 
+		clients.add(u2);
+		u2.start();
 
 //		for (User u : clients) {
 //			u.start();
@@ -55,26 +71,13 @@ public class TestClient2 {
 			u.join();
 		}
 		printOutFSState();
+		System.out.println(new String(read).trim());
 		System.out.println("SHUTTING DOWN");
 	}
 
-	private static ArrayList<User> test1() {
-		ArrayList<User> ret = new ArrayList<User>();
-		User u0 = new User(null, null, 0, 0, DiskOperationType.CREATE);
-		ret.add(u0);
-		u0.start();
-		String t = "Hello World";
-		byte[] data = t.getBytes();
-		byte[] read = new byte[data.length];
-		User u1 = new User(((LocalDFS) Main.globalDFS).getDFileID(0), data, 0, data.length, DiskOperationType.WRITE);
-		ret.add(u1);
-		u1.start();
-		User u2 = new User(((LocalDFS) Main.globalDFS).getDFileID(0), read, 0, data.length, DiskOperationType.READ); 
-		ret.add(u2);
-		u2.start();
-
-		return ret;
-	}
+//	private static ArrayList<User> test1() throws InterruptedException {
+//		
+//	}
 	
 	private static void printOutFSState() {
 		for(Inode n : ((LocalDFS) Main.globalDFS).myInodes) {

@@ -29,7 +29,7 @@ public class InitTester {
 		writeToFile(file);
 		file.close();
 		
-		VirtualDisk myDisk = new LocalVirtualDisk(nameOfFile, false);
+		Main.globalVirtualDisk = new LocalVirtualDisk(nameOfFile, false);
 		LocalDFS myDFS = new LocalDFS(nameOfFile, false);
 //		myDFS.setVirtualDisk(myDisk);
 //		myDFS.setRAFile(file);

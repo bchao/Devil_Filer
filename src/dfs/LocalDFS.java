@@ -141,7 +141,7 @@ public class LocalDFS extends DFS {
 					fileSize = raFile.readInt();
 					raFilePointer += 4;
 				} else {
-					myIntBMap[j-1] = raFile.readInt();
+					myIntBMap[j-2] = raFile.readInt();
 					raFilePointer += 4;
 				}
 			}

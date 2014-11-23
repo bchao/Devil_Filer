@@ -101,7 +101,8 @@ public abstract class VirtualDisk implements IVirtualDisk, Runnable {
 	 * device/disk/volume
 	 */
 	protected int readBlock(DBuffer buf) throws IOException {
-		int seekLen = buf.getBlockID() * Constants.BLOCK_SIZE;
+		//offsetting for empty block zero and inode region
+		int seekLen = getOffset(buf);
 		/* Boundary check */
 		if (_maxVolSize < seekLen + Constants.BLOCK_SIZE) {
 			return -1;
@@ -115,8 +116,12 @@ public abstract class VirtualDisk implements IVirtualDisk, Runnable {
 	 * device/disk/volume
 	 */
 	protected void writeBlock(DBuffer buf) throws IOException {
-		int seekLen = buf.getBlockID() * Constants.BLOCK_SIZE;
+		int seekLen = getOffset(buf);
 		_file.seek(seekLen);
 		_file.write(buf.getBuffer(), 0, Constants.BLOCK_SIZE);
+	}
+
+	private int getOffset(DBuffer buf) {
+		return (buf.getBlockID() + 1 + Constants.MAX_INODE_BLOCKS) * Constants.BLOCK_SIZE;
 	}
 }

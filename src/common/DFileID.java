@@ -5,10 +5,12 @@ public class DFileID {
 
 	private int _dFID;
 	private boolean inUse;
+	private int mySize;
 
 	public DFileID(int dFID) {
 		_dFID = dFID;
 		inUse = false;
+		mySize = 0;
 	}
 
 	public int getDFileID() {
@@ -31,8 +33,16 @@ public class DFileID {
 		return inUse;
 	}
 	
+	public synchronized void incrementSize(int i) {
+		mySize += i;
+	}
+	
 	public synchronized void setInUse(boolean b) {
 		inUse = b;
 		
+	}
+
+	public int getSize() {
+		return mySize;
 	}
 }

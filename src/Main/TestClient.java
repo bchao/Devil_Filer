@@ -113,24 +113,23 @@ public class TestClient implements Runnable {
 		Main.globalDBufferCache = new LocalDBufferCache(Constants.NUM_OF_CACHE_BLOCKS, Main.globalVirtualDisk);
 		Main.globalDFS = new LocalDFS(Constants.vdiskName, false);
 		Main.globalDFS.init();
-        Main.globalDFS.createDFile();
+        DFileID file = Main.globalDFS.createDFile();
         System.out.println("Initialized");
         // DFileID file = dfiler.createDFile();
-        DFileID file = new DFileID(4);
+        //DFileID file = new DFileID(4);
 
         ArrayList<Thread> clients = new ArrayList<Thread>();
-//        for (int i = 0; i < 10; i++) {
-//            TestClient tc = new TestClient(file, i);
-            TestClient tc = new TestClient(file, 0);
+        for (int i = 0; i < 1; i++) {
+            TestClient tc = new TestClient(file, i);
             Thread f = new Thread(tc);
             clients.add(f);
             f.start();
-//        }
+        }
 
         // Sync files to disk
-//        for (Thread tc : clients) {
-//            tc.join();
-//        }
-//        System.out.println("SHUTTING DOWN");
+        for (Thread tc : clients) {
+            tc.join();
+        }
+        System.out.println("SHUTTING DOWN");
     }
 }

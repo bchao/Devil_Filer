@@ -69,6 +69,9 @@ public class InitTester {
 		writeToBytes(b, 0, 10, false);
 		file.write(b, 0, b.length);
 		
+		
+		// write to the correct block
+		
 		seekLen = Constants.BLOCK_SIZE + 2*Constants.INODE_SIZE;
 		file.seek(seekLen);
 		writeToBytes(b, -1, -1, true);

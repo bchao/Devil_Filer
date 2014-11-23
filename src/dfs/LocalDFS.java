@@ -217,6 +217,7 @@ public class LocalDFS extends DFS {
 		myUsedDFID.remove(dFID.getDFileID());
 		
 		dFID.zeroSize();
+		currInode.setInUse(false);
 		dFID.setInUse(false);
 		notifyAll();
 		

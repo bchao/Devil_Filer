@@ -48,6 +48,7 @@ public class TestClient2 {
 		//TestClient2 tc = new TestClient2();
 		//ArrayList<User> clients = test1();
 		
+		//Create Files 0 and 1
 		ArrayList<User> clients = new ArrayList<User>();
 		User u0 = new User(null, null, 0, 0, DiskOperationType.CREATE);
 		clients.add(u0);
@@ -61,10 +62,16 @@ public class TestClient2 {
 		t += t;
 		byte[] data2 = t.getBytes();
 		byte[] read2 = new byte[2*data.length];
+		byte[] read3 = new byte[2*data.length];
 		
 //		User u2 = new User(((LocalDFS) Main.globalDFS).getDFileID(0), data, 0, data.length, DiskOperationType.WRITE);
 //		clients.add(u2);
 //		u2.start();
+		
+		//Write twice to file 0 then read once
+		User u9 = new User(((LocalDFS) Main.globalDFS).getDFileID(0), data, 0, data.length, DiskOperationType.WRITE);
+		clients.add(u9);
+		u9.start();
 		User u3 = new User(((LocalDFS) Main.globalDFS).getDFileID(0), data2, 0, data2.length, DiskOperationType.WRITE);
 		clients.add(u3);
 		u3.start();
@@ -72,16 +79,21 @@ public class TestClient2 {
 		clients.add(u4);
 		u4.start();
 		
+		//Write once to file 1 then read twice
 		User u5 = new User(((LocalDFS) Main.globalDFS).getDFileID(1), data, 0, data.length, DiskOperationType.WRITE);
 		clients.add(u5);
 		u5.start();
 		User u6 = new User(((LocalDFS) Main.globalDFS).getDFileID(1), read2, 0, data.length, DiskOperationType.READ);
 		clients.add(u6);
 		u6.start();
-		
-		User u7 = new User(((LocalDFS) Main.globalDFS).getDFileID(0), null, 0, 0, DiskOperationType.DESTROY);
+		User u7 = new User(((LocalDFS) Main.globalDFS).getDFileID(1), read3, 0, data.length, DiskOperationType.READ);
 		clients.add(u7);
 		u7.start();
+		
+		//Delete file 0
+		User u8 = new User(((LocalDFS) Main.globalDFS).getDFileID(0), null, 0, 0, DiskOperationType.DESTROY);
+		clients.add(u8);
+		u8.start();
 
 //		for (User u : clients) {
 //			u.start();
@@ -90,9 +102,10 @@ public class TestClient2 {
 		for (User u : clients) {
 			u.join();
 		}
-//		printOutFSState();
+		printOutFSState();
 		System.out.println(new String(read).trim());
 		System.out.println(new String(read2).trim());
+		System.out.println(new String(read3).trim());
 		System.out.println("SHUTTING DOWN");
 		Main.globalDFS.sync();
 		Main.globalDFS.shutdown();

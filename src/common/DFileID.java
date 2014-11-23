@@ -39,7 +39,10 @@ public class DFileID {
 	
 	public synchronized void setInUse(boolean b) {
 		inUse = b;
-		
+	}
+	
+	public void zeroSize() {
+		mySize = 0;
 	}
 
 	public int getSize() {

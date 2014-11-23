@@ -52,16 +52,36 @@ public class TestClient2 {
 		User u0 = new User(null, null, 0, 0, DiskOperationType.CREATE);
 		clients.add(u0);
 		u0.start();
-		String t = "Hello World";
-		byte[] data = t.getBytes();
-		byte[] read = new byte[data.length];
-		User u1 = new User(((LocalDFS) Main.globalDFS).getDFileID(0), data, 0, data.length, DiskOperationType.WRITE);
+		User u1 = new User(null, null, 0, 0, DiskOperationType.CREATE);
 		clients.add(u1);
 		u1.start();
-		//User u2 = new User(((LocalDFS) Main.globalDFS).getDFileID(0), data, 0, data.length, DiskOperationType.WRITE);
-		User u2 = new User(((LocalDFS) Main.globalDFS).getDFileID(0), read, 0, data.length, DiskOperationType.READ); 
-		clients.add(u2);
-		u2.start();
+		String t = "Hello World";
+		byte[] data = t.getBytes();
+		byte[] read = new byte[2*data.length];
+		t += t;
+		byte[] data2 = t.getBytes();
+		byte[] read2 = new byte[2*data.length];
+		
+//		User u2 = new User(((LocalDFS) Main.globalDFS).getDFileID(0), data, 0, data.length, DiskOperationType.WRITE);
+//		clients.add(u2);
+//		u2.start();
+		User u3 = new User(((LocalDFS) Main.globalDFS).getDFileID(0), data2, 0, data2.length, DiskOperationType.WRITE);
+		clients.add(u3);
+		u3.start();
+		User u4 = new User(((LocalDFS) Main.globalDFS).getDFileID(0), read, 0, data2.length, DiskOperationType.READ); 
+		clients.add(u4);
+		u4.start();
+		
+		User u5 = new User(((LocalDFS) Main.globalDFS).getDFileID(1), data, 0, data.length, DiskOperationType.WRITE);
+		clients.add(u5);
+		u5.start();
+		User u6 = new User(((LocalDFS) Main.globalDFS).getDFileID(1), read2, 0, data.length, DiskOperationType.READ);
+		clients.add(u6);
+		u6.start();
+		
+		User u7 = new User(((LocalDFS) Main.globalDFS).getDFileID(0), null, 0, 0, DiskOperationType.DESTROY);
+		clients.add(u7);
+		u7.start();
 
 //		for (User u : clients) {
 //			u.start();
@@ -72,6 +92,7 @@ public class TestClient2 {
 		}
 		printOutFSState();
 		System.out.println(new String(read).trim());
+		System.out.println(new String(read2).trim());
 		System.out.println("SHUTTING DOWN");
 	}
 

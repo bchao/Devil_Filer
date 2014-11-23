@@ -203,8 +203,7 @@ public class LocalDFS extends DFS {
 		dFID.setInUse(true);
 		
 		Inode currInode = myInodes[dFID.getDFileID()];
-		// TODO: have to destroy Inode data too
-		currInode.setInUse(false);
+		currInode.setSize(0);		
 
 		for(memBlock block : currInode.getBlockList()) {
 			if(block != null) {
@@ -213,10 +212,11 @@ public class LocalDFS extends DFS {
 			}
 		}
 
+		
 		myFreeDFID.add(dFID);
 		myUsedDFID.remove(dFID.getDFileID());
-//		myUsedDFIDList.remove(dFID);
 		
+		dFID.zeroSize();
 		dFID.setInUse(false);
 		notifyAll();
 		

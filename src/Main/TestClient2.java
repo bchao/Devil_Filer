@@ -70,9 +70,11 @@ public class TestClient2 {
 		for (User u : clients) {
 			u.join();
 		}
-		printOutFSState();
+//		printOutFSState();
 		System.out.println(new String(read).trim());
 		System.out.println("SHUTTING DOWN");
+		Main.globalDFS.sync();
+		Main.globalDFS.shutdown();
 	}
 
 //	private static ArrayList<User> test1() throws InterruptedException {

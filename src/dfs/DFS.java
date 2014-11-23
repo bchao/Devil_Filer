@@ -59,4 +59,6 @@ public abstract class DFS {
 
 	/* Write back all dirty blocks to the volume, and wait for completion. */
 	public abstract void sync();
+	
+	public abstract void shutdown();
 }

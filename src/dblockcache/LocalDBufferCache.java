@@ -1,5 +1,6 @@
 package dblockcache;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -7,6 +8,8 @@ import java.util.Map;
 import java.util.Queue;
 
 import common.Constants;
+import virtualdisk.Inode;
+import virtualdisk.LocalVirtualDisk;
 import virtualdisk.VirtualDisk;
 
 public class LocalDBufferCache extends DBufferCache {
@@ -15,6 +18,7 @@ public class LocalDBufferCache extends DBufferCache {
 	private int myCacheSize;
 	private Queue<Integer> leastRecentlyUsed;
 	private Map<Integer, DBuffer> DBufferMap;
+	private Inode[] myInodes;
 	
 	public LocalDBufferCache(int cacheSize, VirtualDisk disk) {
 		super(cacheSize);
@@ -69,16 +73,32 @@ public class LocalDBufferCache extends DBufferCache {
 		((LocalDBuffer) buf).setBusy(false);
 		//signal??	
 	}
+	
+	public void shutdown() {
+		((LocalVirtualDisk) myDisk).stopDisk();
+	}
+	
+	public synchronized void getInodes(Inode[] inodes) {
+		myInodes = inodes;
+	}
 
 	@Override
 	public synchronized void sync() {
 		for (Integer id : DBufferMap.keySet()) {
 			LocalDBuffer dbuf = (LocalDBuffer) DBufferMap.get(id);
 			if (!dbuf.checkClean()) {
+				try {
+					myDisk.writeInode(id, myInodes[id]);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
 				dbuf.startPush();
 				dbuf.waitClean();
 			}
 		}
+		
 		notifyAll();
 	}
 }

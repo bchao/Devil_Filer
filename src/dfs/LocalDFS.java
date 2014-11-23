@@ -302,7 +302,7 @@ public class LocalDFS extends DFS {
 			}
 
 			//write to dbuffer
-			//int currOffset = startOffset + Constants.MAX_INODE_BLOCKS + Constants.BLOCK_SIZE;
+			int currOffset = startOffset + Constants.MAX_INODE_BLOCKS + Constants.BLOCK_SIZE;
 			LocalDBuffer dBuffer = (LocalDBuffer) myDBufferCache.getBlock(blockID);
 			dBuffer.write(buffer, startOffset, count);
 		}

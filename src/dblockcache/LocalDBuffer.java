@@ -97,24 +97,21 @@ public class LocalDBuffer extends DBuffer {
 	@Override
 	public synchronized int read(byte[] buffer, int startOffset, int count) {
 		isBusy = true;
-		
+
 		if (count > buffer.length) {
-			count = buffer.length;
+			return -1;
 		}
 		
 		if (startOffset + count > buffer.length || startOffset + count < 0 || !isValid) {
 			return -1;
 		}
 		
+		if (count > Constants.BLOCK_SIZE) count = Constants.BLOCK_SIZE;
+
 		for(int i = startOffset; i < startOffset + count; i++) {
-			if(i == (count - 1)) {
-				notifyAll();
-				return count;
-			} else {
-				buffer[i - startOffset] = myBuffer[i];
-			}
+			buffer[i - startOffset] = myBuffer[i];
 		}
-		
+
 		isBusy = false;
 		notifyAll();
 		return count;
@@ -123,26 +120,24 @@ public class LocalDBuffer extends DBuffer {
 	@Override
 	public synchronized int write(byte[] buffer, int startOffset, int count) {
 		isBusy = true;
-		
+
 		if(count > buffer.length) {
-			count = buffer.length;
+			//count = buffer.length;
+			return -1;
 		}
-		
+
 		if(startOffset + count > buffer.length || startOffset + count < 0 || !isValid) {
 			return -1;
 		}
 		
+		if(count > Constants.BLOCK_SIZE) count = Constants.BLOCK_SIZE;
+
 		isClean = false;
-		
+
 		for(int i = startOffset; i < startOffset + count; i++) {
-			if(i == (count-1)) {
-				notifyAll();
-				return count;
-			} else {
-				myBuffer[i - startOffset] = buffer[i];
-			}
+			myBuffer[i - startOffset] = buffer[i];
 		}
-		
+
 		isBusy = false;
 		notifyAll();
 		return count;
@@ -164,7 +159,7 @@ public class LocalDBuffer extends DBuffer {
 	public byte[] getBuffer() {
 		return myBuffer;
 	}
-	
+
 	public void setBusy(boolean busy) {
 		isBusy = busy;
 	}

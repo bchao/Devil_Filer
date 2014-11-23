@@ -33,8 +33,16 @@ public class DFileID {
 		return inUse;
 	}
 	
+	public synchronized void incrementSize(int i) {
+		mySize += i;
+	}
+	
 	public synchronized void setInUse(boolean b) {
 		inUse = b;
 		
+	}
+
+	public int getSize() {
+		return mySize;
 	}
 }

@@ -237,8 +237,7 @@ public class LocalDFS extends DFS {
 		
 		Inode currInode = myInodes[dFID.getDFileID()];
 		//int currOffset = startOffset + Constants.MAX_INODE_BLOCKS + 1;
-		int currOffset = startOffset + Constants.MAX_INODE_BLOCKS + Constants.BLOCK_SIZE;
-		int currCount = count;
+		//int currOffset = startOffset + Constants.MAX_INODE_BLOCKS + Constants.BLOCK_SIZE;
 
 		if(currInode == null)
 			return -1;
@@ -246,11 +245,13 @@ public class LocalDFS extends DFS {
 		for(memBlock block : currInode.getBlockList()) {
 			if(block == null)
 				continue;
-
+			
+			int numBytesWritten;
 			LocalDBuffer dbuff = (LocalDBuffer) myDBufferCache.getBlock(block.getBlockID());
-			dbuff.read(buffer, currOffset, currCount);
-			currOffset += count;
-			currCount -= count;
+			
+			numBytesWritten = dbuff.read(buffer, startOffset, count);
+			count -= numBytesWritten;
+			startOffset += numBytesWritten;
 		}
 
 		dFID.setInUse(false);
@@ -265,7 +266,8 @@ public class LocalDFS extends DFS {
 	 */
 	@Override
 	public synchronized int write(DFileID dFID, byte[] buffer, int startOffset, int count) {
-		
+		int totalNumBytesWritten = 0;
+		int numBytesWritten = 0;
 		while (dFID.isInUse()) {
 			try {
 				wait();
@@ -279,7 +281,7 @@ public class LocalDFS extends DFS {
 		Inode currInode = myInodes[dFID.getDFileID()];
 		int index = 0;
 		
-		for(int DFileBlock : getDFileBlocks(startOffset, count)) {
+		for(int DFileBlock : getDFileBlocks(count)) {
 			memBlock mb = currInode.getBlockList()[DFileBlock];
 			int blockID;
 			//TODO
@@ -300,32 +302,47 @@ public class LocalDFS extends DFS {
 			} else {
 				blockID = mb.getBlockID();
 			}
-
+			
 			//write to dbuffer
 			//int currOffset = startOffset + Constants.MAX_INODE_BLOCKS + Constants.BLOCK_SIZE;
 			LocalDBuffer dBuffer = (LocalDBuffer) myDBufferCache.getBlock(blockID);
-			dBuffer.write(buffer, startOffset, count);
+			numBytesWritten = dBuffer.write(buffer, startOffset, count);			
+			count -= numBytesWritten;
+			startOffset += numBytesWritten;
+			totalNumBytesWritten += numBytesWritten;
 		}
-
+		if (totalNumBytesWritten > dFID.getSize()) {
+			dFID.incrementSize(numBytesWritten);
+			currInode.setSize(dFID.getSize());
+		}
+		
 		dFID.setInUse(false);
 		notifyAll();
 		
 		return 0;
 	}
 
-	private ArrayList<Integer> getDFileBlocks(int startOffset, int count) {
+	private ArrayList<Integer> getDFileBlocks(int count) {
 		ArrayList<Integer> ret = new ArrayList<Integer>();
-		int x = startOffset % Constants.BLOCK_SIZE;
-		ret.add(x);
-
-		while(count > Constants.BLOCK_SIZE) {
-			ret.add(++x);
+		int index = 0;
+		
+		while (count > Constants.BLOCK_SIZE) {
+			ret.add(index);
 			count -= Constants.BLOCK_SIZE;
+			index++;
 		}
-
-		if(startOffset + count > Constants.BLOCK_SIZE) {
-			ret.add(++x);
-		}
+		ret.add(index);
+//		int x = startOffset % Constants.BLOCK_SIZE;
+//		ret.add(x);
+//
+//		while(count > Constants.BLOCK_SIZE) {
+//			ret.add(++x);
+//			count -= Constants.BLOCK_SIZE;
+//		}
+//
+//		if(startOffset + count > Constants.BLOCK_SIZE) {
+//			ret.add(++x);
+//		}
 
 		return ret;
 	}

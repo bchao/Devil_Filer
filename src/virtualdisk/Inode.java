@@ -71,6 +71,10 @@ public class Inode {
 		return toRet;
 	}
 	
+	public int getSize() {
+		return fileSize;
+	}
+	
 	public void printOut() {
 		System.out.println("*** Inode ***");
 		System.out.println("Is active: "+inUse);

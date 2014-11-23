@@ -6,10 +6,13 @@ package virtualdisk;
  *
  */
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.RandomAccessFile;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import virtualdisk.Inode.memBlock;
 import common.Constants;
 import common.Constants.DiskOperationType;
 import dblockcache.DBuffer;
@@ -109,6 +112,40 @@ public abstract class VirtualDisk implements IVirtualDisk, Runnable {
 		}
 		_file.seek(seekLen);
 		return _file.read(buf.getBuffer(), 0, Constants.BLOCK_SIZE);
+	}
+	
+	public void writeInode(int id, Inode inode) throws IOException {
+		int seekLen = (1 + id) * Constants.BLOCK_SIZE;
+		
+		_file.seek(seekLen);
+		// boolean inUse
+		byte[] inUse = (inode.getInUse() == true) ? intToBytes(-1) : intToBytes(0);
+		_file.write(inUse);
+		
+		// int fileSize
+		_file.write(intToBytes(inode.getSize()));
+		
+		// blocks of memory
+		memBlock[] blocks = inode.getBlockList();
+		for(int i = 0; i < 4; i++) {
+			if(blocks[i] != null) {
+				_file.write(intToBytes(blocks[i].getBlockID()));
+			}
+			else {
+				// or should I continue and skip over this?
+				break;
+			}
+		}
+	}
+	
+	private static byte[] intToBytes(int x) throws IOException {
+	    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+	    DataOutputStream out = new DataOutputStream(bos);
+	    out.writeInt(x);
+	    out.close();
+	    byte[] int_bytes = bos.toByteArray();
+	    bos.close();
+	    return int_bytes;
 	}
 
 	/*

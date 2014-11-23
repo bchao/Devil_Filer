@@ -64,5 +64,8 @@ public class TestClient implements Runnable {
             tc.join();
         }
         System.out.println("SHUTTING DOWN");
+        Main.globalDFS.sync();
+        Main.globalDFS.shutdown();
+        
     }
 }

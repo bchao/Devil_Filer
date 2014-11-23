@@ -35,6 +35,13 @@ public class LocalVirtualDisk extends VirtualDisk implements Runnable {
 			requestQueue.notifyAll();
 		}
 	}
+	
+	public void stopDisk() {
+		synchronized(requestQueue) {
+			running = false;
+			requestQueue.notifyAll();
+		}
+	}
 
 	public void run() {
 		running = true;

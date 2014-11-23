@@ -29,7 +29,7 @@ public class InitTester {
 		writeToFile(file);
 		file.close();
 		
-		VirtualDisk myDisk = new LocalVirtualDisk(nameOfFile, false);
+		Main.globalVirtualDisk = new LocalVirtualDisk(nameOfFile, false);
 		LocalDFS myDFS = new LocalDFS(nameOfFile, false);
 //		myDFS.setVirtualDisk(myDisk);
 //		myDFS.setRAFile(file);
@@ -68,6 +68,9 @@ public class InitTester {
 		file.write(b, 0, b.length);
 		writeToBytes(b, 0, 10, false);
 		file.write(b, 0, b.length);
+		
+		
+		// write to the correct block
 		
 		seekLen = Constants.BLOCK_SIZE + 2*Constants.INODE_SIZE;
 		file.seek(seekLen);

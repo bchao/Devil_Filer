@@ -135,7 +135,7 @@ public class LocalDBuffer extends DBuffer {
 		isClean = false;
 		
 		for(int i = startOffset; i < startOffset + count; i++) {
-			if(i < (count-1)) {
+			if(i == (count-1)) {
 				notifyAll();
 				return count;
 			} else {

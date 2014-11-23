@@ -236,7 +236,8 @@ public class LocalDFS extends DFS {
 		dFID.setInUse(true);
 		
 		Inode currInode = myInodes[dFID.getDFileID()];
-		int currOffset = startOffset + Constants.MAX_INODE_BLOCKS + 1;
+		//int currOffset = startOffset + Constants.MAX_INODE_BLOCKS + 1;
+		int currOffset = startOffset + Constants.MAX_INODE_BLOCKS + Constants.BLOCK_SIZE;
 		int currCount = count;
 
 		if(currInode == null)
@@ -276,7 +277,8 @@ public class LocalDFS extends DFS {
 		dFID.setInUse(true);
 		
 		Inode currInode = myInodes[dFID.getDFileID()];
-
+		int index = 0;
+		
 		for(int DFileBlock : getDFileBlocks(startOffset, count)) {
 			memBlock mb = currInode.getBlockList()[DFileBlock];
 			int blockID;
@@ -294,11 +296,13 @@ public class LocalDFS extends DFS {
 
 				blockID = myFreeBlocks.get(0);
 				myFreeBlocks.remove((Integer) blockID);
+				currInode.addBlock(index++, blockID);
 			} else {
 				blockID = mb.getBlockID();
 			}
 
 			//write to dbuffer
+			//int currOffset = startOffset + Constants.MAX_INODE_BLOCKS + Constants.BLOCK_SIZE;
 			LocalDBuffer dBuffer = (LocalDBuffer) myDBufferCache.getBlock(blockID);
 			dBuffer.write(buffer, startOffset, count);
 		}

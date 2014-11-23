@@ -25,8 +25,8 @@ public class Main {
 		globalTestEventBarrier = new EventBarrier();
 		
 //		testCreateFile();
-		testDestroyFile();
-//		testReadWriteFile();
+//		testDestroyFile();
+		testReadWriteFile();
 		
 //		globalTestEventBarrier.arrive(); // wait until everything has tested
 		
@@ -34,15 +34,15 @@ public class Main {
 	}
 	
 	private static void testReadWriteFile() {
-		DFileID dfid = globalDFS.createDFile();
-
+		
+		User u0 = new User(null, null, 0, 0, Constants.DiskOperationType.CREATE);
 		byte[] arr = new byte[4];
 		arr[0] = (byte) 10;
 		arr[1] = (byte) 20;
 		arr[2] = (byte) 30;
 		arr[3] = (byte) 40;
-		User user1 = new User(dfid, arr, 0, 4, Constants.DiskOperationType.WRITE);
-		user1.start();
+		User u1 = new User(((LocalDFS) globalDFS).getDFileID(0), arr, 0, 4, Constants.DiskOperationType.WRITE);
+		u1.start();
 	}
 	
 	private static void testCreateFile() {

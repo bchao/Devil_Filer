@@ -98,7 +98,7 @@ public class LocalDFS extends DFS {
 		for (int i = 0; i < myInodes.length; i++) {
 			if (myInodes[i].getInUse()) {
 				//myUsedDFID.add(new DFileID(i));
-				myUsedDFID.put(0, new DFileID(i));
+				myUsedDFID.put(i, new DFileID(i));
 				for (int blockID : myInodes[i].getUsedBlocks()) {
 					myFreeBlocks.remove((Integer) blockID);
 				}
@@ -374,15 +374,21 @@ public class LocalDFS extends DFS {
 	}
 
 	@Override
-	public void sync() {
+	public synchronized void sync() {
 		// TODO Auto-generated method stub
 		myDBufferCache.getInodes(myInodes);
 		myDBufferCache.sync();
+		notify();
 	}
 	
-	public void shutdown() {
+	public synchronized void shutdown() {
 		sync();
 		//myDBufferCache.shutdown();
+		try {
+			wait();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		writeInodeRegion();
 	}
 

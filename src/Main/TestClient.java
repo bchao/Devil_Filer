@@ -28,7 +28,7 @@ public class TestClient implements Runnable {
 	
 	private void extTest() {
 		System.out.println("Write test");
-		//WriteTest(dfid, "INITIAL");
+		WriteTest(dfid, "INITIAL");
 		
 		String read = ReadTest(dfid);
 		System.out.println("read: "+read);

@@ -42,7 +42,7 @@ public class TestClient2 {
 		Main.globalDFS.init();
 		//DFileID file = Main.globalDFS.createDFile();
 		System.out.println("Initialized");
-		boolean readTest = true;
+		boolean readTest = false;
 		if (readTest) {
 			printOutFSState();
 		}

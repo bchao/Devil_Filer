@@ -134,10 +134,15 @@ public class LocalDBuffer extends DBuffer {
 
 		isClean = false;
 
+//		for (int i = 0; i < myBuffer.length; i++) {
+//			System.out.println((char)myBuffer[i]);
+//		}
+		
 		for(int i = startOffset; i < startOffset + count; i++) {
+			//System.out.println(buffer[i]);
 			myBuffer[i - startOffset] = buffer[i];
 		}
-
+		
 		isBusy = false;
 		notifyAll();
 		return count;

@@ -58,16 +58,15 @@ public class TestClient2 {
 		u1.start();
 		String t = "Hello World";
 		byte[] data = t.getBytes();
-		byte[] read = new byte[2*data.length];
+		byte[] read = new byte[50];
 		t += t;
 		byte[] data2 = t.getBytes();
-		byte[] read2 = new byte[2*data.length];
-		byte[] read3 = new byte[2*data.length];
+		byte[] read2 = new byte[50];
+		byte[] read3 = new byte[50];
+//		t = "yo";
+//		data = t.getBytes();
 		
-//		User u2 = new User(((LocalDFS) Main.globalDFS).getDFileID(0), data, 0, data.length, DiskOperationType.WRITE);
-//		clients.add(u2);
-//		u2.start();
-		
+		//System.out.println(new String(data2).trim());
 		//Write twice to file 0 then read once
 		User u9 = new User(((LocalDFS) Main.globalDFS).getDFileID(0), data, 0, data.length, DiskOperationType.WRITE);
 		clients.add(u9);
@@ -75,7 +74,7 @@ public class TestClient2 {
 		User u3 = new User(((LocalDFS) Main.globalDFS).getDFileID(0), data2, 0, data2.length, DiskOperationType.WRITE);
 		clients.add(u3);
 		u3.start();
-		User u4 = new User(((LocalDFS) Main.globalDFS).getDFileID(0), read, 0, data2.length, DiskOperationType.READ); 
+		User u4 = new User(((LocalDFS) Main.globalDFS).getDFileID(0), read, 0, 50, DiskOperationType.READ); 
 		clients.add(u4);
 		u4.start();
 		
@@ -83,10 +82,10 @@ public class TestClient2 {
 		User u5 = new User(((LocalDFS) Main.globalDFS).getDFileID(1), data, 0, data.length, DiskOperationType.WRITE);
 		clients.add(u5);
 		u5.start();
-		User u6 = new User(((LocalDFS) Main.globalDFS).getDFileID(1), read2, 0, data.length, DiskOperationType.READ);
+		User u6 = new User(((LocalDFS) Main.globalDFS).getDFileID(1), read2, 0, 50, DiskOperationType.READ);
 		clients.add(u6);
 		u6.start();
-		User u7 = new User(((LocalDFS) Main.globalDFS).getDFileID(1), read3, 0, data.length, DiskOperationType.READ);
+		User u7 = new User(((LocalDFS) Main.globalDFS).getDFileID(1), read3, 0, 50, DiskOperationType.READ);
 		clients.add(u7);
 		u7.start();
 		
@@ -94,6 +93,9 @@ public class TestClient2 {
 		User u8 = new User(((LocalDFS) Main.globalDFS).getDFileID(0), null, 0, 0, DiskOperationType.DESTROY);
 		clients.add(u8);
 		u8.start();
+		User u11 = new User(((LocalDFS) Main.globalDFS).getDFileID(1), null, 0, 0, DiskOperationType.DESTROY);
+		clients.add(u11);
+		u11.start();
 
 //		for (User u : clients) {
 //			u.start();
@@ -102,12 +104,11 @@ public class TestClient2 {
 		for (User u : clients) {
 			u.join();
 		}
-		printOutFSState();
+		//printOutFSState();
 		System.out.println(new String(read).trim());
 		System.out.println(new String(read2).trim());
 		System.out.println(new String(read3).trim());
 		System.out.println("SHUTTING DOWN");
-		Main.globalDFS.sync();
 		Main.globalDFS.shutdown();
 	}
 

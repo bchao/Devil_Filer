@@ -87,12 +87,12 @@ public class LocalDBufferCache extends DBufferCache {
 		for (Integer id : DBufferMap.keySet()) {
 			LocalDBuffer dbuf = (LocalDBuffer) DBufferMap.get(id);
 			if (!dbuf.checkClean()) {
-				try {
-					myDisk.writeInode(id, myInodes[id]);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+//				try {
+//					//myDisk.writeInode(id, myInodes[id]);
+//				} catch (IOException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
 				
 				dbuf.startPush();
 				dbuf.waitClean();

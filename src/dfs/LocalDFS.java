@@ -127,7 +127,8 @@ public class LocalDFS extends DFS {
 			boolean inUse = true;
 			for (int j = 0; j < Constants.INODE_SIZE/4; j++) {
 				if (j == 0) {
-					if (raFile.readInt() != -1) {
+					int x = raFile.readInt();
+					if (x != -1) {
 						raFilePointer += (Constants.INODE_SIZE); 
 						raFile.seek(raFilePointer);
 						myInodes[i] = new Inode(); // create the inode that has use = false
@@ -382,7 +383,46 @@ public class LocalDFS extends DFS {
 	
 	public void shutdown() {
 		sync();
-		myDBufferCache.shutdown();
+		//myDBufferCache.shutdown();
+		writeInodeRegion();
+	}
+
+	
+	private void writeInodeRegion() {
+		try {
+			
+			RandomAccessFile raFile = virtualDisk.returnRAF();
+			
+			int raFilePointer = Constants.BLOCK_SIZE;
+			raFile.seek(raFilePointer);
+		
+			for (Inode n : myInodes) {
+				if (n.getInUse()) {
+					for (int j = 0; j < Constants.INODE_SIZE/4; j++) {
+						if (j == 0) {
+							raFile.writeInt(-1);
+							raFilePointer += 4;
+						} else if (j == 1) {
+							raFile.writeInt(n.getSize());
+							raFilePointer += 4;
+						} else {
+							if (n.getBlockList()[j - Constants.NUMBER_INODE_METADATA] == null) {
+								raFile.writeInt(0);
+								raFilePointer += 4;
+							} else {
+								raFile.writeInt(n.getBlockList()[j - Constants.NUMBER_INODE_METADATA].getBlockID());
+								raFilePointer += 4;
+							}
+						}
+					}			
+				} else {
+					raFilePointer += Constants.INODE_SIZE;
+					raFile.seek(raFilePointer);
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public Inode[] getINodes() {

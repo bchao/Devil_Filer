@@ -54,7 +54,7 @@ public class Inode {
 
 	public void setBlockMap(int[] myBMap) {
 		for (int i = 0; i < myBMap.length; i++) {
-			if (myBMap[i] == 0) 
+			if (myBMap[i] == 0 && fileSize < Constants.BLOCK_SIZE*i) 
 				myBlockList[i] = null;
 			else 
 				myBlockList[i] = new memBlock(myBMap[i]);

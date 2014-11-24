@@ -42,20 +42,29 @@ public class TestClient2 {
 		Main.globalDFS.init();
 		//DFileID file = Main.globalDFS.createDFile();
 		System.out.println("Initialized");
+		boolean readTest = true;
+		if (readTest) {
+			printOutFSState();
+		}
 		// DFileID file = dfiler.createDFile();
 		//DFileID file = new DFileID(4);
 
 		//TestClient2 tc = new TestClient2();
 		//ArrayList<User> clients = test1();
 		
+		
 		//Create Files 0 and 1
 		ArrayList<User> clients = new ArrayList<User>();
-		User u0 = new User(null, null, 0, 0, DiskOperationType.CREATE);
-		clients.add(u0);
-		u0.start();
-		User u1 = new User(null, null, 0, 0, DiskOperationType.CREATE);
-		clients.add(u1);
-		u1.start();
+		
+		if (!readTest) {
+			User u0 = new User(null, null, 0, 0, DiskOperationType.CREATE);
+			clients.add(u0);
+			u0.start();
+			User u1 = new User(null, null, 0, 0, DiskOperationType.CREATE);
+			clients.add(u1);
+			u1.start();
+		}
+
 		String t = "Hello World";
 		byte[] data = t.getBytes();
 		byte[] read = new byte[50];
@@ -68,20 +77,27 @@ public class TestClient2 {
 		
 		//System.out.println(new String(data2).trim());
 		//Write twice to file 0 then read once
-		User u9 = new User(((LocalDFS) Main.globalDFS).getDFileID(0), data, 0, data.length, DiskOperationType.WRITE);
-		clients.add(u9);
-		u9.start();
-		User u3 = new User(((LocalDFS) Main.globalDFS).getDFileID(0), data2, 0, data2.length, DiskOperationType.WRITE);
-		clients.add(u3);
-		u3.start();
+		
+		if (!readTest) {
+			User u9 = new User(((LocalDFS) Main.globalDFS).getDFileID(0), data, 0, data.length, DiskOperationType.WRITE);
+			clients.add(u9);
+			u9.start();
+			User u3 = new User(((LocalDFS) Main.globalDFS).getDFileID(0), data2, 0, data2.length, DiskOperationType.WRITE);
+			clients.add(u3);
+			u3.start();
+		}
+
 		User u4 = new User(((LocalDFS) Main.globalDFS).getDFileID(0), read, 0, 50, DiskOperationType.READ); 
 		clients.add(u4);
 		u4.start();
 		
 		//Write once to file 1 then read twice
-		User u5 = new User(((LocalDFS) Main.globalDFS).getDFileID(1), data, 0, data.length, DiskOperationType.WRITE);
-		clients.add(u5);
-		u5.start();
+		if (!readTest) {
+			User u5 = new User(((LocalDFS) Main.globalDFS).getDFileID(1), data, 0, data.length, DiskOperationType.WRITE);
+			clients.add(u5);
+			u5.start();
+		}
+
 		User u6 = new User(((LocalDFS) Main.globalDFS).getDFileID(1), read2, 0, 50, DiskOperationType.READ);
 		clients.add(u6);
 		u6.start();
@@ -90,12 +106,12 @@ public class TestClient2 {
 		u7.start();
 		
 		//Delete file 0
-		User u8 = new User(((LocalDFS) Main.globalDFS).getDFileID(0), null, 0, 0, DiskOperationType.DESTROY);
-		clients.add(u8);
-		u8.start();
-		User u11 = new User(((LocalDFS) Main.globalDFS).getDFileID(1), null, 0, 0, DiskOperationType.DESTROY);
-		clients.add(u11);
-		u11.start();
+//		User u8 = new User(((LocalDFS) Main.globalDFS).getDFileID(0), null, 0, 0, DiskOperationType.DESTROY);
+//		clients.add(u8);
+//		u8.start();
+//		User u11 = new User(((LocalDFS) Main.globalDFS).getDFileID(1), null, 0, 0, DiskOperationType.DESTROY);
+//		clients.add(u11);
+//		u11.start();
 
 //		for (User u : clients) {
 //			u.start();
@@ -104,7 +120,7 @@ public class TestClient2 {
 		for (User u : clients) {
 			u.join();
 		}
-		//printOutFSState();
+		printOutFSState();
 		System.out.println(new String(read).trim());
 		System.out.println(new String(read2).trim());
 		System.out.println(new String(read3).trim());

@@ -133,10 +133,6 @@ public class LocalDBuffer extends DBuffer {
 		if(count > Constants.BLOCK_SIZE) count = Constants.BLOCK_SIZE;
 
 		isClean = false;
-
-//		for (int i = 0; i < myBuffer.length; i++) {
-//			System.out.println((char)myBuffer[i]);
-//		}
 		
 		for(int i = startOffset; i < startOffset + count; i++) {
 			//System.out.println(buffer[i]);

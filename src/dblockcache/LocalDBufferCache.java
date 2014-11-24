@@ -18,7 +18,6 @@ public class LocalDBufferCache extends DBufferCache {
 	private int myCacheSize;
 	private Queue<Integer> leastRecentlyUsed;
 	private Map<Integer, DBuffer> DBufferMap;
-	private Inode[] myInodes;
 	
 	public LocalDBufferCache(int cacheSize, VirtualDisk disk) {
 		super(cacheSize);
@@ -78,22 +77,11 @@ public class LocalDBufferCache extends DBufferCache {
 		((LocalVirtualDisk) myDisk).stopDisk();
 	}
 	
-	public synchronized void getInodes(Inode[] inodes) {
-		myInodes = inodes;
-	}
-
 	@Override
 	public synchronized void sync() {
 		for (Integer id : DBufferMap.keySet()) {
 			LocalDBuffer dbuf = (LocalDBuffer) DBufferMap.get(id);
-			if (!dbuf.checkClean()) {
-//				try {
-//					//myDisk.writeInode(id, myInodes[id]);
-//				} catch (IOException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-				
+			if (!dbuf.checkClean()) {				
 				dbuf.startPush();
 				dbuf.waitClean();
 			}

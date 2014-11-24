@@ -24,12 +24,8 @@ public class Main {
 		globalDFS.init();
 		globalTestEventBarrier = new EventBarrier();
 		
-//		testCreateFile();
-//		testDestroyFile();
 		testReadWriteFile();
-		
-//		globalTestEventBarrier.arrive(); // wait until everything has tested
-		
+				
 		printOutFSState();
 	}
 	

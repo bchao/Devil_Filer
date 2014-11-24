@@ -23,7 +23,6 @@ public class LocalDFS extends DFS {
 	public RandomAccessFile myRAFile;
 	public LinkedList<DFileID> myFreeDFID;
 	public HashMap<Integer, DFileID> myUsedDFID;
-//	public LinkedList<DFileID> myUsedDFIDList;
 	public LinkedList<Integer> myFreeBlocks;
 	public Inode[] myInodes;
 
@@ -65,22 +64,7 @@ public class LocalDFS extends DFS {
 	@Override
 	public void init() {
 
-//				if(myDBufferCache == null) {
-//					try {
-//						myDBufferCache = new LocalDBufferCache(Constants.NUM_OF_CACHE_BLOCKS, new LocalVirtualDisk(super._volName, super._format));
-//					} catch (FileNotFoundException e) {
-//						e.printStackTrace();
-//					} catch (IOException e) {
-//						e.printStackTrace();
-//					}
-//				}
-
-		// will need to change back 
-
 		RandomAccessFile raFile = virtualDisk.returnRAF();
-//		RandomAccessFile raFile = myRAFile;
-
-		//HashMap<DFileID, Inode> map = new HashMap<DFileID, Inode>();
 
 		// read through the virtual disk to get the goods
 
@@ -109,7 +93,6 @@ public class LocalDFS extends DFS {
 
 	}
 
-	// NOT TESTED, WILL DO TOMORROW (Wednesday) -- why does inode have to have size?
 	/**
 	 * This method assumes we just have a tag (-1) if its a written file and a block map
 	 * @param raFile the file passed in
@@ -334,18 +317,6 @@ public class LocalDFS extends DFS {
 			index++;
 		}
 		ret.add(index);
-//		int x = startOffset % Constants.BLOCK_SIZE;
-//		ret.add(x);
-//
-//		while(count > Constants.BLOCK_SIZE) {
-//			ret.add(++x);
-//			count -= Constants.BLOCK_SIZE;
-//		}
-//
-//		if(startOffset + count > Constants.BLOCK_SIZE) {
-//			ret.add(++x);
-//		}
-
 		return ret;
 	}
 	
@@ -376,7 +347,6 @@ public class LocalDFS extends DFS {
 	@Override
 	public synchronized void sync() {
 		// TODO Auto-generated method stub
-		myDBufferCache.getInodes(myInodes);
 		myDBufferCache.sync();
 		notify();
 	}

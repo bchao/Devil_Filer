@@ -48,8 +48,6 @@ public class TestClient implements Runnable {
 		Main.globalDFS.init();
         DFileID file = Main.globalDFS.createDFile();
         System.out.println("Initialized");
-        // DFileID file = dfiler.createDFile();
-        //DFileID file = new DFileID(4);
 
         ArrayList<Thread> clients = new ArrayList<Thread>();
         for (int i = 0; i < 1; i++) {

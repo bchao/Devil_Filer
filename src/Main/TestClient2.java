@@ -12,28 +12,7 @@ import dfs.LocalDFS;
 
 public class TestClient2 {
 	private static String readStr;
-	//public TestClient2() {}
-
-	//	private void WriteTest(DFileID f, String t) {
-	//		byte[] data = t.getBytes();
-	//		Main.globalDFS.write(f, data, 0, data.length);
-	//	}
-	//
-	//	private String ReadTest(DFileID f) {
-	//		byte[] read = new byte[100];
-	//		Main.globalDFS.read(f, read, 0, 50);
-	//		return new String(read).trim();
-	//	}
-	//
-	//	private void extTest() {
-	//		System.out.println("Write test");
-	//		WriteTest(dfid, "INITIAL");
-	//
-	//		String read = ReadTest(dfid);
-	//		System.out.println("read: "+read);
-	//
-	//	}
-
+	
 	public static void main (String[] args) throws Exception {
 		System.out.println("Initializing DFS");
 		Main.globalVirtualDisk = new LocalVirtualDisk(Constants.vdiskName, false);
@@ -46,13 +25,7 @@ public class TestClient2 {
 		if (readTest) {
 			printOutFSState();
 		}
-		// DFileID file = dfiler.createDFile();
-		//DFileID file = new DFileID(4);
 
-		//TestClient2 tc = new TestClient2();
-		//ArrayList<User> clients = test1();
-		
-		
 		//Create Files 0 and 1
 		ArrayList<User> clients = new ArrayList<User>();
 		
@@ -72,10 +45,7 @@ public class TestClient2 {
 		byte[] data2 = t.getBytes();
 		byte[] read2 = new byte[50];
 		byte[] read3 = new byte[50];
-//		t = "yo";
-//		data = t.getBytes();
 		
-		//System.out.println(new String(data2).trim());
 		//Write twice to file 0 then read once
 		
 		if (!readTest) {
@@ -113,9 +83,6 @@ public class TestClient2 {
 //		clients.add(u11);
 //		u11.start();
 
-//		for (User u : clients) {
-//			u.start();
-//		}
 		// Sync files to disk
 		for (User u : clients) {
 			u.join();
@@ -128,9 +95,6 @@ public class TestClient2 {
 		Main.globalDFS.shutdown();
 	}
 
-//	private static ArrayList<User> test1() throws InterruptedException {
-//		
-//	}
 	
 	private static void printOutFSState() {
 		for(Inode n : ((LocalDFS) Main.globalDFS).myInodes) {

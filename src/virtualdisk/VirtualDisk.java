@@ -113,39 +113,6 @@ public abstract class VirtualDisk implements IVirtualDisk, Runnable {
 		_file.seek(seekLen);
 		return _file.read(buf.getBuffer(), 0, Constants.BLOCK_SIZE);
 	}
-	
-	public void writeInode(int id, Inode inode) throws IOException {
-		int seekLen = (1 + id) * Constants.BLOCK_SIZE;
-		
-		_file.seek(seekLen);
-		// boolean inUse
-		byte[] inUse = (inode.getInUse()) ? intToBytes(-1) : intToBytes(0);
-		_file.write(inUse);
-		
-		// int fileSize
-		_file.write(intToBytes(inode.getSize()));
-		
-		// blocks of memory
-		memBlock[] blocks = inode.getBlockList();
-		for(int i = 0; i < Constants.INODE_SIZE/4 - Constants.NUMBER_INODE_METADATA; i++) {
-			int dataToWrite = 0;
-			if(blocks[i] != null) {
-				dataToWrite = blocks[i].getBlockID();
-			}
-			
-			_file.write(intToBytes(dataToWrite));
-		}
-	}
-	
-	private static byte[] intToBytes(int x) throws IOException {
-	    ByteArrayOutputStream bos = new ByteArrayOutputStream();
-	    DataOutputStream out = new DataOutputStream(bos);
-	    out.writeInt(x);
-	    out.close();
-	    byte[] int_bytes = bos.toByteArray();
-	    bos.close();
-	    return int_bytes;
-	}
 
 	/*
 	 * Writes the buffer associated with DBuffer to the underlying

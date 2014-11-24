@@ -119,7 +119,7 @@ public abstract class VirtualDisk implements IVirtualDisk, Runnable {
 		
 		_file.seek(seekLen);
 		// boolean inUse
-		byte[] inUse = (inode.getInUse() == true) ? intToBytes(-1) : intToBytes(0);
+		byte[] inUse = (inode.getInUse()) ? intToBytes(-1) : intToBytes(0);
 		_file.write(inUse);
 		
 		// int fileSize
@@ -127,14 +127,13 @@ public abstract class VirtualDisk implements IVirtualDisk, Runnable {
 		
 		// blocks of memory
 		memBlock[] blocks = inode.getBlockList();
-		for(int i = 0; i < 4; i++) {
+		for(int i = 0; i < Constants.INODE_SIZE/4 - Constants.NUMBER_INODE_METADATA; i++) {
+			int dataToWrite = 0;
 			if(blocks[i] != null) {
-				_file.write(intToBytes(blocks[i].getBlockID()));
+				dataToWrite = blocks[i].getBlockID();
 			}
-			else {
-				// or should I continue and skip over this?
-				break;
-			}
+			
+			_file.write(intToBytes(dataToWrite));
 		}
 	}
 	

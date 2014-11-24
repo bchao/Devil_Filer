@@ -378,7 +378,6 @@ public class LocalDFS extends DFS {
 		// TODO Auto-generated method stub
 		myDBufferCache.getInodes(myInodes);
 		myDBufferCache.sync();
-		
 	}
 	
 	public void shutdown() {
